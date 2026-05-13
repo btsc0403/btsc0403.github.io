@@ -456,6 +456,120 @@
     line-height:1.55;
     color:rgba(255,255,255,.62);
   }
+
+  /* Combined Architecture + Agent slide */
+  .combo-wrap{
+    width:100%;
+    max-width:1400px;
+    display:flex;
+    flex-direction:column;
+    gap:1.25rem;
+  }
+  .combo-head{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .combo-title{
+    font-size:clamp(1.8rem, 3vw, 2.6rem);
+    margin-top:.45rem;
+    line-height:1.1;
+  }
+  .combo-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.75rem;
+    align-items:stretch;
+  }
+  .combo-pane{
+    display:flex;
+    flex-direction:column;
+    gap:.75rem;
+    padding:1.25rem 1.35rem;
+    border:1px solid rgba(26,26,26,.08);
+    border-radius:18px;
+    background:rgba(255,255,255,.58);
+    box-shadow:0 18px 50px -32px rgba(26,26,26,.35);
+  }
+  .combo-pane-head{
+    display:flex;
+    align-items:center;
+    gap:.65rem;
+  }
+  .combo-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.7rem;
+    font-weight:800;
+    letter-spacing:.14em;
+    background:rgba(156,0,0,.1);
+    color:#9C0000;
+    padding:.3rem .55rem;
+    border-radius:999px;
+  }
+  .combo-pane-title{
+    font-family:'Noto Serif SC',serif;
+    font-size:1.2rem;
+    font-weight:700;
+    color:#1a1a1a;
+    margin:0;
+  }
+  .combo-desc{
+    margin:0;
+    font-size:.84rem;
+    line-height:1.65;
+    color:rgba(26,26,26,.72);
+  }
+  .combo-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.35rem;
+  }
+  .combo-chips .chip{
+    font-size:.68rem;
+    padding:.2rem .55rem;
+  }
+  .combo-arch-img{
+    flex:1;
+    margin-top:.3rem;
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+    border:1px solid rgba(0,0,0,.06);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:.5rem;
+    min-height:200px;
+  }
+  .combo-arch-img img{
+    max-width:100%;
+    max-height:42vh;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+    display:block;
+  }
+  .combo-chat{
+    margin-top:.3rem;
+    border-radius:14px;
+    border:1px solid rgba(0,0,0,.06);
+    background:#fff;
+    padding:.85rem 1rem;
+    box-shadow:0 18px 40px -28px rgba(0,0,0,.2);
+    display:flex;
+    flex-direction:column;
+    gap:.5rem;
+    flex:1;
+  }
+  .combo-chat-head{
+    display:flex;
+    align-items:center;
+    gap:.4rem;
+    font-size:.66rem;
+    color:rgba(26,26,26,.55);
+    padding-bottom:.4rem;
+    border-bottom:1px dashed rgba(0,0,0,.08);
+  }
   .mini-flow-nav{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -609,6 +723,8 @@
     .stat-strip{grid-template-columns:repeat(2,1fr)}
     .pillar-strip{grid-template-columns:1fr}
     .hero-shot-full img{max-height:none}
+    .combo-grid{grid-template-columns:1fr; gap:1rem}
+    .combo-arch-img img{max-height:40vh}
     .hint{display:none}
     .flow-wrap{grid-template-columns:1fr}
     .flow-img img{max-height:60vh}
@@ -629,16 +745,15 @@
   <nav class="nav" aria-label="Portfolio sections">
     <button class="nav-link" data-target="0"><span class="lang-zh">首页</span><span class="lang-en">Home</span></button>
     <button class="nav-link" data-target="1">GISauto</button>
-    <button class="nav-link" data-target="2"><span class="lang-zh">架构</span><span class="lang-en">Arch</span></button>
-    <button class="nav-link" data-target="3">Agent</button>
-    <button class="nav-link" data-target="4"><span class="lang-zh">论文</span><span class="lang-en">Papers</span></button>
-    <button class="nav-link" data-target="5"><span class="lang-zh">经历</span><span class="lang-en">Timeline</span></button>
-    <button class="nav-link" data-target="6"><span class="lang-zh">项目</span><span class="lang-en">Projects</span></button>
-    <button class="nav-link" data-target="7"><span class="lang-zh">技能</span><span class="lang-en">Skills</span></button>
-    <button class="nav-link" data-target="8"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></button>
+    <button class="nav-link" data-target="2"><span class="lang-zh">架构 · Agent</span><span class="lang-en">Arch · Agent</span></button>
+    <button class="nav-link" data-target="3"><span class="lang-zh">论文</span><span class="lang-en">Papers</span></button>
+    <button class="nav-link" data-target="4"><span class="lang-zh">经历</span><span class="lang-en">Timeline</span></button>
+    <button class="nav-link" data-target="5"><span class="lang-zh">项目</span><span class="lang-en">Projects</span></button>
+    <button class="nav-link" data-target="6"><span class="lang-zh">技能</span><span class="lang-en">Skills</span></button>
+    <button class="nav-link" data-target="7"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></button>
   </nav>
   <div style="display:flex; align-items:center; gap:.75rem">
-    <span class="slide-counter" id="slideCounter">01/09</span>
+    <span class="slide-counter" id="slideCounter">01/08</span>
     <button id="langBtn" class="chip" style="cursor:pointer; font-weight:600">
       <span class="lang-zh">EN</span><span class="lang-en">中文</span>
     </button>
@@ -693,7 +808,7 @@
         <a onclick="goTo(1)" style="cursor:pointer; background:#9C0000; color:#fff; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">看 GISauto →</span><span class="lang-en">See GISauto →</span>
         </a>
-        <a onclick="goTo(8)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
+        <a onclick="goTo(7)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">联系我</span><span class="lang-en">Get in touch</span>
         </a>
       </div>
@@ -774,120 +889,86 @@
 </section>
 
 <!-- =========================================================
-  SLIDE 3 · FLOWCHART 1 · SYSTEM ARCHITECTURE
+  SLIDE 3 · ARCHITECTURE + AGENT (combined)
 ========================================================= -->
 <section class="slide paper grain" id="s3">
-  <div class="flow-wrap">
-    <div>
-      <div class="eyebrow">Architecture · 02</div>
-      <h2 class="display" style="font-size:2.5rem; margin-top:.75rem">
-        <span class="lang-zh">系统架构</span><span class="lang-en">System Architecture</span>
+  <div class="combo-wrap">
+    <div class="combo-head">
+      <div class="eyebrow">Architecture &middot; Agent &middot; 02</div>
+      <h2 class="display combo-title">
+        <span class="lang-zh">系统架构 &nbsp;·&nbsp; In-page Agent</span>
+        <span class="lang-en">Architecture &nbsp;·&nbsp; In-page Agent</span>
       </h2>
-      <div class="rule" style="width:90px; margin-top:1rem"></div>
-      <p style="margin-top:1.25rem; color:rgba(26,26,26,.75); line-height:1.75; font-size:.95rem">
-        <span class="lang-zh">三层结构：Vue 3 + Mars2D 前端管地图与对话交互；FastAPI 层把问题路由到 5 个检索接口；Neo4j 存建筑 / 构件 / 文档三类节点，向量索引与关系遍历共同服务检索。</span>
-        <span class="lang-en">A three-tier system. Vue 3 + Mars2D handles map &amp; dialogue on the front. FastAPI routes each query across 5 retrieval endpoints. Neo4j holds Building / Component / Document nodes, serving retrieval through both vector indexes and graph traversal.</span>
-      </p>
+      <div class="rule" style="width:90px; margin-top:.6rem"></div>
+    </div>
 
-      <div style="margin-top:1.5rem; display:flex; flex-wrap:wrap; gap:.5rem">
-        <span class="chip">Vue 3 + Vite</span>
-        <span class="chip">Mars2D</span>
-        <span class="chip">FastAPI</span>
-        <span class="chip">Neo4j 5.x</span>
-        <span class="chip">Docker Compose</span>
-      </div>
-
-      <div style="margin-top:1.75rem; padding-left:1rem; border-left:3px solid #9C0000">
-        <div style="font-size:.75rem; letter-spacing:.18em; color:#9C0000; font-weight:700">KEY INSIGHT</div>
-        <p style="margin-top:.35rem; font-size:.9rem; color:rgba(26,26,26,.8); line-height:1.6; font-family:'Noto Serif SC',serif">
-          <span class="lang-zh">&ldquo;地图即入口，图谱即大脑，对话即指针。&rdquo;</span>
-          <span class="lang-en">&ldquo;Map is the entry, graph is the brain, dialogue is the pointer.&rdquo;</span>
+    <div class="combo-grid">
+      <!-- LEFT: Architecture -->
+      <div class="combo-pane">
+        <div class="combo-pane-head">
+          <span class="combo-num">01</span>
+          <h3 class="combo-pane-title">
+            <span class="lang-zh">系统架构</span><span class="lang-en">System Architecture</span>
+          </h3>
+        </div>
+        <p class="combo-desc">
+          <span class="lang-zh">Vue 3 + Mars2D 前端 / FastAPI 路由 / Neo4j 图谱。地图即入口，图谱即大脑，对话即指针。</span>
+          <span class="lang-en">Vue 3 + Mars2D front, FastAPI router, Neo4j graph. Map = entry, graph = brain, dialogue = pointer.</span>
         </p>
-      </div>
-    </div>
-    <div class="flow-img">
-      <img src="assets/vinci_raw/s10_system.png" alt="System architecture flowchart" />
-    </div>
-  </div>
-</section>
-
-<!-- =========================================================
-  SLIDE 6 · AGENT CHAT DEMO
-========================================================= -->
-<section class="slide paper grain" id="s6">
-  <div style="width:100%; max-width:1280px; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center">
-    <div>
-      <div class="eyebrow">In-page Agent · 03</div>
-      <h2 class="display" style="font-size:2.6rem; margin-top:.75rem">
-        <span class="lang-zh">一个懂<span style="color:#9C0000">建筑 / 空间 / 图像</span>的研究伙伴。</span>
-        <span class="lang-en">A companion that knows <span style="color:#9C0000">buildings, space &amp; images</span>.</span>
-      </h2>
-      <div class="rule" style="width:90px; margin-top:1rem"></div>
-
-      <ul style="margin-top:1.5rem; list-style:none; padding:0; display:grid; gap:.85rem; font-size:.88rem; color:rgba(26,26,26,.8); line-height:1.65">
-        <li style="display:flex; gap:.75rem">
-          <span class="dot" style="margin-top:.55rem; flex-shrink:0"></span>
-          <span>
-            <b><span class="lang-zh">工具使用。</span><span class="lang-en">Tool use.</span></b>
-            <span class="lang-zh">chatStore 根据输入自动挑用 5 个后端接口（question / by-text-image / by-component / image-to-building / image-to-component）。</span>
-            <span class="lang-en">chatStore dispatches across 5 endpoints (question / by-text-image / by-component / image-to-building / image-to-component).</span>
-          </span>
-        </li>
-        <li style="display:flex; gap:.75rem">
-          <span class="dot" style="margin-top:.55rem; flex-shrink:0"></span>
-          <span>
-            <b><span class="lang-zh">多模态证据。</span><span class="lang-en">Grounded evidence.</span></b>
-            <span class="lang-zh">回复追溯到具体 Building / Component / Document 节点与 PDF 片段，不是凭空生成。</span>
-            <span class="lang-en">Each answer traces back to Neo4j nodes and PDF chunks — not hallucination.</span>
-          </span>
-        </li>
-        <li style="display:flex; gap:.75rem">
-          <span class="dot" style="margin-top:.55rem; flex-shrink:0"></span>
-          <span>
-            <b><span class="lang-zh">人机共探。</span><span class="lang-en">Human-AI loop.</span></b>
-            <span class="lang-zh">对话结果反向驱动地图点亮、图谱展开、构件墙筛选，形成闭环。</span>
-            <span class="lang-en">Replies drive the UI back: markers highlight, the graph expands, the tag-wall filters.</span>
-          </span>
-        </li>
-      </ul>
-    </div>
-
-    <div style="border-radius:18px; border:1px solid rgba(0,0,0,.06); background:#fff; padding:1.25rem; box-shadow:0 24px 60px -30px rgba(0,0,0,.25); display:flex; flex-direction:column; gap:.6rem; min-height:420px">
-      <div style="display:flex; align-items:center; gap:.5rem; font-size:.72rem; color:rgba(26,26,26,.55); padding-bottom:.5rem; border-bottom:1px dashed rgba(0,0,0,.08)">
-        <span style="width:8px; height:8px; border-radius:999px; background:#22c55e"></span>
-        <span>GISauto Agent</span>
-        <span style="margin-left:auto">DeepSeek-V3 &middot; 4-lane RAG</span>
-      </div>
-
-      <div class="bubble-user" style="align-self:flex-end; max-width:85%; border-radius:18px 18px 4px 18px; padding:.55rem .9rem; font-size:.88rem">
-        <span class="lang-zh">南宁有哪些带马头墙的民居？</span>
-        <span class="lang-en">Any Nanning vernacular houses with horse-head walls?</span>
-      </div>
-
-      <div class="bubble-bot" style="align-self:flex-start; max-width:92%; border-radius:18px 18px 18px 4px; padding:.55rem .9rem; font-size:.85rem; color:rgba(26,26,26,.88)">
-        <div style="font-size:.68rem; color:rgba(26,26,26,.45); margin-bottom:.3rem"><span class="lang-zh">检索路径</span><span class="lang-en">Retrieval</span></div>
-        <div style="display:flex; flex-wrap:wrap; gap:.3rem">
-          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">city: <span class="lang-zh">南宁</span><span class="lang-en">Nanning</span></span>
-          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">component: <span class="lang-zh">马头墙</span><span class="lang-en">horse-head wall</span></span>
-          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">BGE text</span>
-          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">CLIP image</span>
+        <div class="combo-chips">
+          <span class="chip">Vue 3</span>
+          <span class="chip">Mars2D</span>
+          <span class="chip">FastAPI</span>
+          <span class="chip">Neo4j 5.x</span>
+          <span class="chip">Docker</span>
+        </div>
+        <div class="combo-arch-img">
+          <img src="assets/vinci_raw/s10_system.png" alt="System architecture flowchart" />
         </div>
       </div>
 
-      <div class="bubble-bot" style="align-self:flex-start; max-width:92%; border-radius:18px 18px 18px 4px; padding:.55rem .9rem; font-size:.85rem; color:rgba(26,26,26,.88)">
-        <p style="margin:0"><span class="lang-zh">命中 6 处，其中 3 处证据最强：</span><span class="lang-en">6 hits, top 3 by evidence:</span></p>
-        <ul style="margin:.3rem 0 .3rem 1.2rem; padding:0; color:rgba(26,26,26,.8); font-size:.82rem">
-          <li><span class="lang-zh">扬美古镇举人屋（清代 &middot; 砖木）</span><span class="lang-en">Yangmei Juren House (Qing &middot; brick-timber)</span></li>
-          <li><span class="lang-zh">灵水陈氏宗祠</span><span class="lang-en">Lingshui Chen Ancestral Hall</span></li>
-          <li><span class="lang-zh">黄氏民居</span><span class="lang-en">Huang Residence</span></li>
-        </ul>
-        <p style="margin:0; font-size:.68rem; color:rgba(26,26,26,.5)">
-          <span class="lang-zh">地图已高亮 &middot; 构件裁剪图已附</span>
-          <span class="lang-en">Markers highlighted &middot; component crops attached</span>
+      <!-- RIGHT: Agent -->
+      <div class="combo-pane">
+        <div class="combo-pane-head">
+          <span class="combo-num">02</span>
+          <h3 class="combo-pane-title">
+            <span class="lang-zh">In-page Agent</span><span class="lang-en">In-page Agent</span>
+          </h3>
+        </div>
+        <p class="combo-desc">
+          <span class="lang-zh">chatStore 根据输入自动调度 5 个后端接口，回复追溯到 Neo4j 节点 + PDF 片段。</span>
+          <span class="lang-en">chatStore dispatches across 5 endpoints; replies trace back to Neo4j nodes &amp; PDF chunks.</span>
         </p>
-      </div>
 
-      <div class="typing" style="align-self:flex-start"><span></span><span></span><span></span></div>
+        <div class="combo-chat">
+          <div class="combo-chat-head">
+            <span style="width:8px; height:8px; border-radius:999px; background:#22c55e"></span>
+            <span>GISauto Agent</span>
+            <span style="margin-left:auto">DeepSeek-V3 &middot; 4-lane RAG</span>
+          </div>
+          <div class="bubble-user" style="align-self:flex-end; max-width:85%; border-radius:14px 14px 4px 14px; padding:.5rem .8rem; font-size:.78rem">
+            <span class="lang-zh">南宁有哪些带马头墙的民居？</span>
+            <span class="lang-en">Nanning houses with horse-head walls?</span>
+          </div>
+          <div class="bubble-bot" style="align-self:flex-start; max-width:92%; border-radius:14px 14px 14px 4px; padding:.5rem .8rem; font-size:.76rem; color:rgba(26,26,26,.88)">
+            <div style="font-size:.62rem; color:rgba(26,26,26,.45); margin-bottom:.25rem"><span class="lang-zh">检索路径</span><span class="lang-en">Retrieval</span></div>
+            <div style="display:flex; flex-wrap:wrap; gap:.25rem">
+              <span class="chip" style="font-size:.6rem; padding:.1rem .4rem">city: <span class="lang-zh">南宁</span><span class="lang-en">Nanning</span></span>
+              <span class="chip" style="font-size:.6rem; padding:.1rem .4rem"><span class="lang-zh">构件</span><span class="lang-en">component</span>: <span class="lang-zh">马头墙</span><span class="lang-en">horse-head</span></span>
+              <span class="chip" style="font-size:.6rem; padding:.1rem .4rem">BGE</span>
+              <span class="chip" style="font-size:.6rem; padding:.1rem .4rem">CLIP</span>
+            </div>
+          </div>
+          <div class="bubble-bot" style="align-self:flex-start; max-width:92%; border-radius:14px 14px 14px 4px; padding:.5rem .8rem; font-size:.76rem; color:rgba(26,26,26,.88)">
+            <p style="margin:0"><span class="lang-zh">命中 6 处，证据最强 3 例：</span><span class="lang-en">6 hits, top 3 by evidence:</span></p>
+            <ul style="margin:.25rem 0 .25rem 1rem; padding:0; color:rgba(26,26,26,.8); font-size:.72rem">
+              <li><span class="lang-zh">扬美古镇举人屋</span><span class="lang-en">Yangmei Juren House</span></li>
+              <li><span class="lang-zh">灵水陈氏宗祠</span><span class="lang-en">Lingshui Chen Hall</span></li>
+              <li><span class="lang-zh">黄氏民居</span><span class="lang-en">Huang Residence</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1271,8 +1352,7 @@
   const railLabels = [
     ['首页', 'Home'],
     ['GISauto', 'GISauto'],
-    ['架构', 'Architecture'],
-    ['Agent', 'Agent'],
+    ['架构·Agent', 'Arch·Agent'],
     ['论文', 'Papers'],
     ['经历', 'Timeline'],
     ['项目', 'Projects'],
@@ -1287,8 +1367,7 @@
     { start: 4, end: 4 },
     { start: 5, end: 5 },
     { start: 6, end: 6 },
-    { start: 7, end: 7 },
-    { start: 8, end: 8 }
+    { start: 7, end: 7 }
   ];
 
   // Build rail dots
