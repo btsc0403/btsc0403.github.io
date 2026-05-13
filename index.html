@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>王钰淞 · Yusong Wang — GIS × Multimodal AI</title>
+<meta name="description" content="王钰淞 Yusong Wang — HKUST(GZ) MPhil, GISauto/HeritageExplorer, multimodal RAG & agent workflow." />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: { DEFAULT: '#9C0000', ink: '#1a1a1a', cream: '#faf7f2', paper: '#f4ece0' }
+        },
+        fontFamily: {
+          sans: ['"Inter"', '"PingFang SC"', '"Microsoft YaHei"', 'system-ui', 'sans-serif'],
+          serif: ['"Noto Serif SC"', '"Source Han Serif SC"', 'Georgia', 'serif'],
+          mono: ['"JetBrains Mono"', 'ui-monospace', 'Menlo', 'monospace']
+        }
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root { color-scheme: light; --accent:#9C0000; --ink:#1a1a1a; --paper:#faf7f2; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Inter','PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+    color:var(--ink);
+    background:#f8f4ec;
+    overflow:hidden;
+  }
+
+  /* Language toggle */
+  body[data-lang="zh"] [data-en]:not([data-zh]){display:none}
+  body[data-lang="en"] [data-zh]:not([data-en]){display:none}
+  body[data-lang="zh"] .lang-en{display:none}
+  body[data-lang="en"] .lang-zh{display:none}
+
+  /* Horizontal deck */
+  .deck{
+    height:100vh;
+    width:100vw;
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+  }
+  .deck::-webkit-scrollbar{display:none}
+  .slide{
+    flex:0 0 100vw;
+    height:100vh;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:3.5rem clamp(3rem,5vw,6rem) 5rem clamp(12rem,14vw,14rem);
+    overflow:hidden;
+  }
+
+  /* Paper + grain */
+  .paper{
+    background:
+      radial-gradient(800px 420px at 15% 10%, rgba(255,232,216,.85) 0%, transparent 55%),
+      radial-gradient(900px 520px at 100% 0%, rgba(218,236,230,.85) 0%, transparent 55%),
+      linear-gradient(135deg, #fbf7ef 0%, #f3eee2 100%);
+  }
+  .grain::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(rgba(0,0,0,0.035) 1px, transparent 1px);
+    background-size:3px 3px;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+    opacity:.6;
+  }
+  .ink{
+    background:
+      radial-gradient(840px 520px at 90% 0%, rgba(31,111,104,.28), transparent 60%),
+      radial-gradient(680px 420px at 5% 95%, rgba(156,0,0,.3), transparent 62%),
+      #141212;
+    color:#fff
+  }
+  .ink.grain::before{background-image:radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)}
+
+  /* Top bar + side nav */
+  .topbar{
+    position:fixed; top:0; left:0; right:0;
+    z-index:50;
+    padding:.85rem 1.15rem;
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(248,244,236,.88);
+    border-bottom:1px solid rgba(26,26,26,.08);
+    backdrop-filter:blur(14px);
+    pointer-events:none;
+    box-shadow:0 18px 45px -38px rgba(26,26,26,.45);
+  }
+  .topbar > *{pointer-events:auto}
+  .brand-lockup{
+    display:flex;
+    align-items:baseline;
+    gap:.45rem;
+    color:inherit;
+    text-decoration:none;
+    white-space:nowrap;
+  }
+  .nav{
+    display:flex;
+    align-items:center;
+    gap:.18rem;
+    border:1px solid rgba(26,26,26,.08);
+    background:rgba(255,255,255,.58);
+    padding:.25rem;
+    border-radius:999px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+  }
+  .nav-link{
+    border:0;
+    background:transparent;
+    color:rgba(26,26,26,.62);
+    cursor:pointer;
+    border-radius:999px;
+    padding:.42rem .72rem;
+    font-size:.74rem;
+    font-weight:700;
+    letter-spacing:.05em;
+    transition:all .2s ease;
+  }
+  .nav-link:hover{color:#9C0000; background:rgba(156,0,0,.06)}
+  .nav-link.active{background:#1f6f68; color:#fff; box-shadow:0 8px 20px -16px #1f6f68}
+  .slide-counter{
+    font-family:'JetBrains Mono',ui-monospace,monospace;
+    font-size:.72rem;
+    color:rgba(26,26,26,.52);
+    min-width:46px;
+    text-align:center;
+  }
+
+  .rail{
+    position:fixed; left:1.1rem; top:50%; transform:translateY(-50%);
+    z-index:40;
+    display:flex; flex-direction:column; gap:.45rem;
+  }
+  .rail button{
+    width:164px; min-height:36px; border-radius:999px;
+    background:rgba(255,255,255,.62);
+    border:1px solid rgba(26,26,26,.08);
+    cursor:pointer; transition:all .25s;
+    display:flex; align-items:center; gap:.45rem;
+    padding:.38rem .72rem;
+    color:rgba(26,26,26,.56);
+    box-shadow:0 10px 30px -24px rgba(26,26,26,.7);
+  }
+  .rail button::before{
+    content:attr(data-num);
+    width:23px; height:23px; border-radius:999px;
+    display:grid; place-items:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem; font-weight:800;
+    background:rgba(156,0,0,.08);
+    color:#9C0000;
+    flex-shrink:0;
+  }
+  .rail button span{
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-size:.8rem; font-weight:800;
+  }
+  .rail button:hover{background:rgba(31,111,104,.1); color:#1f6f68}
+  .rail button.active{background:#9C0000; color:#fff; border-color:#9C0000; transform:translateX(4px)}
+  .rail button.active::before{background:rgba(255,255,255,.18); color:#fff}
+
+  /* Progress */
+  .progress{
+    position:fixed; left:0; top:0; height:2px; width:0%;
+    background:#9C0000; z-index:60; transition:width .15s;
+  }
+
+  /* Hint */
+  .hint{
+    position:fixed; right:1.5rem; bottom:1.25rem;
+    z-index:40;
+    font-size:.72rem; letter-spacing:.22em; text-transform:uppercase;
+    color:rgba(26,26,26,.55);
+    display:flex; align-items:center; gap:.5rem;
+  }
+  .hint .arrow{display:inline-block; animation:nudge 1.6s infinite}
+  @keyframes nudge{
+    0%,100%{transform:translateX(0)}
+    50%{transform:translateX(6px)}
+  }
+
+  /* Typography helpers */
+  .eyebrow{font-size:.72rem; letter-spacing:.28em; text-transform:uppercase; font-weight:600; color:#9C0000}
+  .display{font-family:'Noto Serif SC','Source Han Serif SC',Georgia,serif; font-weight:700; line-height:1.02; letter-spacing:-.01em}
+  .rule{height:1px; background:linear-gradient(90deg,#9C0000, rgba(156,0,0,0) 70%)}
+  .chip{display:inline-flex; align-items:center; gap:.35rem; border:1px solid rgba(0,0,0,.1); background:rgba(255,255,255,.7); padding:.28rem .7rem; border-radius:999px; font-size:.72rem; color:rgba(26,26,26,.8); backdrop-filter:blur(4px)}
+  .ink .chip{border-color:rgba(255,255,255,.12); background:rgba(255,255,255,.06); color:rgba(255,255,255,.85)}
+  .card{border:1px solid rgba(0,0,0,.06); background:rgba(255,255,255,.7); padding:1.5rem; border-radius:18px; backdrop-filter:blur(8px); box-shadow:0 1px 0 rgba(0,0,0,.03)}
+  .ink .card{background:rgba(255,255,255,.04); border-color:rgba(255,255,255,.08)}
+  .dot{width:8px; height:8px; border-radius:999px; background:#9C0000; box-shadow:0 0 0 4px rgba(156,0,0,.12)}
+  .geo-grid{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    opacity:.34;
+    background-image:
+      linear-gradient(rgba(31,111,104,.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(31,111,104,.18) 1px, transparent 1px);
+    background-size:44px 44px;
+    mask-image:radial-gradient(circle at 72% 38%, #000 0%, transparent 62%);
+  }
+  .route-line{
+    position:absolute;
+    height:2px;
+    background:linear-gradient(90deg, transparent, #1f6f68, #d99152, transparent);
+    opacity:.55;
+    transform-origin:left center;
+  }
+  .visual-stack{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:.75rem;
+  }
+  .visual-card{
+    position:relative;
+    min-height:130px;
+    border:1px solid rgba(255,255,255,.11);
+    border-radius:16px;
+    overflow:hidden;
+    background:rgba(255,255,255,.04);
+  }
+  .visual-card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    filter:saturate(.92) contrast(1.04);
+  }
+  .visual-card b{
+    position:absolute;
+    left:.8rem;
+    bottom:.65rem;
+    z-index:1;
+    font-size:.72rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#fff;
+    text-shadow:0 1px 10px rgba(0,0,0,.55);
+  }
+  .visual-card::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, transparent 38%, rgba(0,0,0,.58));
+  }
+  .mini-flow-nav{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:.65rem;
+    margin-top:1.4rem;
+  }
+  .mini-flow-nav button{
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.05);
+    color:rgba(255,255,255,.84);
+    border-radius:12px;
+    padding:.75rem;
+    text-align:left;
+    cursor:pointer;
+    transition:all .2s ease;
+  }
+  .mini-flow-nav button:hover{background:rgba(31,111,104,.28); transform:translateY(-2px)}
+  .mini-flow-nav small{display:block; color:#ffb36f; font-size:.62rem; letter-spacing:.14em; margin-bottom:.3rem}
+  .project-grid{
+    margin-top:2.2rem;
+    display:grid;
+    grid-template-columns:1.05fr .95fr;
+    gap:1.25rem;
+    align-items:stretch;
+  }
+  .project-pillars{display:grid; grid-template-columns:repeat(3,1fr); gap:.85rem}
+  .hero-layout{
+    width:100%;
+    max-width:1180px;
+    z-index:2;
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) 320px;
+    gap:3.2rem;
+    align-items:center;
+  }
+  .hero-copy{max-width:780px}
+  .portrait-card{
+    margin:0;
+    position:relative;
+    border-radius:24px;
+    border:1px solid rgba(26,26,26,.08);
+    background:rgba(255,255,255,.64);
+    padding:.75rem;
+    box-shadow:0 34px 90px -48px rgba(26,26,26,.55);
+    transform:rotate(2deg);
+  }
+  .portrait-card::before{
+    content:"";
+    position:absolute;
+    inset:18px -18px -18px 18px;
+    border:1px solid rgba(31,111,104,.22);
+    border-radius:24px;
+    z-index:-1;
+  }
+  .portrait-card img{
+    width:100%;
+    height:390px;
+    display:block;
+    object-fit:cover;
+    object-position:center 34%;
+    border-radius:18px;
+    filter:saturate(.95) contrast(1.02);
+  }
+  .portrait-card figcaption{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:.75rem;
+    padding:.7rem .25rem .1rem;
+    font-size:.7rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:rgba(26,26,26,.58);
+  }
+
+  /* Hero decor */
+  .slab{position:absolute; border-radius:24px}
+  .slab.red{background:#9C0000; color:#fff}
+  .slab.paper{background:#fff; border:1px solid rgba(0,0,0,.06)}
+  .circle-seal{
+    width:120px; height:120px; border-radius:999px;
+    border:1px dashed rgba(156,0,0,.4);
+    display:flex; align-items:center; justify-content:center;
+    font-size:.65rem; letter-spacing:.22em; text-transform:uppercase;
+    color:#9C0000;
+    animation:spin 22s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Stats */
+  .stat-big{font-family:'Noto Serif SC',serif; font-weight:700; font-size:4rem; color:#9C0000; line-height:1}
+
+  /* Flowchart slide */
+  .flow-wrap{
+    display:grid;
+    grid-template-columns: 390px 1fr;
+    gap:2.5rem;
+    width:100%;
+    max-width:1400px;
+    align-items:center;
+  }
+  .flow-img{
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid rgba(0,0,0,.08);
+    background:#fff;
+    box-shadow:0 30px 90px -42px rgba(0,0,0,.42);
+    padding:.8rem;
+    position:relative;
+  }
+  .flow-img img{width:100%; height:auto; display:block; object-fit:contain; max-height:72vh}
+  .ink .flow-img{background:#fff}
+
+  /* Chat demo */
+  .chat-shell{background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.6))}
+  .bubble-user{background:#9C0000; color:#fff}
+  .bubble-bot{background:#fff; border:1px solid rgba(0,0,0,.06)}
+  .typing span{width:6px; height:6px; margin:0 2px; display:inline-block; border-radius:999px; background:#9C0000; opacity:.5; animation:blink 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s} .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,100%{opacity:.3; transform:translateY(0)}50%{opacity:1; transform:translateY(-2px)}}
+
+  /* Timeline */
+  .tl{position:relative; padding:0 0 0 0}
+  .tl-line{position:absolute; left:0; right:0; top:50%; height:2px; background:linear-gradient(90deg, rgba(156,0,0,.2), rgba(156,0,0,.6), rgba(156,0,0,.2))}
+  .tl-item{position:relative; padding-top:1.25rem}
+  .tl-item::before{content:""; position:absolute; top:-5px; left:0; width:12px; height:12px; border-radius:999px; background:#9C0000; box-shadow:0 0 0 4px rgba(156,0,0,.12)}
+
+  /* Marquee */
+  .marquee{display:flex; gap:2.25rem; white-space:nowrap; animation:mq 28s linear infinite; font-family:'Noto Serif SC',serif; font-weight:700}
+  @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+  /* Mobile */
+  @media (max-width: 900px){
+    body{overflow:auto}
+    .deck{display:block; height:auto; overflow:visible}
+    .slide{flex:none; width:100vw; height:auto; min-height:auto; padding:4rem 1.25rem}
+    .rail{display:none}
+    .nav{display:none}
+    .brand-lockup span:last-child{display:none}
+    .slide-counter{display:none}
+    .topbar{padding:.75rem 1rem}
+    .slab,.circle-seal,.route-line,.geo-grid{display:none}
+    .hero-layout{grid-template-columns:1fr; gap:1.35rem}
+    .hero-copy{max-width:none}
+    .portrait-card{width:138px; justify-self:start; padding:.45rem; border-radius:18px; transform:none; margin-top:.25rem}
+    .portrait-card::before{display:none}
+    .portrait-card img{height:168px; border-radius:14px}
+    .portrait-card figcaption{display:none}
+    .visual-stack,.mini-flow-nav,.project-grid,.project-pillars{grid-template-columns:1fr}
+    .hint{display:none}
+    .flow-wrap{grid-template-columns:1fr}
+    .flow-img img{max-height:60vh}
+  }
+</style>
+</head>
+<body data-lang="zh" class="antialiased">
+
+<div class="progress" id="progress"></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="#s0" class="brand-lockup font-serif text-lg" onclick="goTo(0);return false;">
+    <span class="lang-zh">王钰淞</span><span class="lang-en">Yusong Wang</span>
+    <span style="margin-left:.5rem;color:#9C0000">·</span>
+    <span style="color:rgba(26,26,26,.55); font-size:.9rem">GIS × Multimodal AI</span>
+  </a>
+  <nav class="nav" aria-label="Portfolio sections">
+    <button class="nav-link" data-target="0"><span class="lang-zh">首页</span><span class="lang-en">Home</span></button>
+    <button class="nav-link" data-target="1">GISauto</button>
+    <button class="nav-link" data-target="2"><span class="lang-zh">架构图</span><span class="lang-en">Architecture</span></button>
+    <button class="nav-link" data-target="4"><span class="lang-zh">论文</span><span class="lang-en">Papers</span></button>
+    <button class="nav-link" data-target="5"><span class="lang-zh">经历</span><span class="lang-en">Timeline</span></button>
+    <button class="nav-link" data-target="8"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></button>
+  </nav>
+  <div style="display:flex; align-items:center; gap:.75rem">
+    <span class="slide-counter" id="slideCounter">01/09</span>
+    <button id="langBtn" class="chip" style="cursor:pointer; font-weight:600">
+      <span class="lang-zh">EN</span><span class="lang-en">中文</span>
+    </button>
+    <a href="CV_Yusong_Wang.docx" class="chip" style="font-weight:600">
+      <span class="lang-zh">简历</span><span class="lang-en">CV</span>
+    </a>
+  </div>
+</div>
+
+<!-- SIDE RAIL -->
+<div class="rail" id="rail"></div>
+
+<!-- HINT -->
+<div class="hint">
+  <span class="lang-zh">滚轮 / 方向键</span><span class="lang-en">Scroll / Arrows</span>
+  <span class="arrow">→</span>
+</div>
+
+<div class="deck" id="deck">
+
+<!-- =========================================================
+  SLIDE 0 · HERO
+========================================================= -->
+<section class="slide paper grain" id="s0">
+  <div class="geo-grid" style="opacity:.22"></div>
+  <div class="route-line" style="width:34vw; left:55%; top:27%; transform:rotate(-14deg)"></div>
+  <div class="route-line" style="width:28vw; left:52%; top:67%; transform:rotate(12deg); opacity:.38"></div>
+  <div class="slab paper" style="right:7%; top:17%; width:250px; height:160px; background:transparent; border:1px solid rgba(31,111,104,.22); box-shadow:none"></div>
+  <div class="slab paper" style="right:13%; bottom:18%; width:170px; height:110px; background:transparent; border:1px solid rgba(156,0,0,.18); box-shadow:none"></div>
+  <div class="slab red" style="right:5%; bottom:14%; width:44px; height:44px; border-radius:999px; opacity:.12"></div>
+  <div class="slab paper" style="left:18%; top:24%; width:96px; height:96px; background:transparent; border:1px dashed rgba(156,0,0,.18); box-shadow:none"></div>
+  <div class="hero-layout">
+    <div class="hero-copy">
+      <div class="eyebrow">Portfolio · 2026 · HKUST(GZ)</div>
+      <h1 class="display" style="font-size:clamp(3rem, 6vw, 5.8rem); margin-top:1.25rem">
+        <span class="lang-zh"><span style="color:#9C0000">王钰淞</span><br/>GIS 与多模态 AI<br/>研究 / 工程。</span>
+        <span class="lang-en"><span style="color:#9C0000">Yusong Wang</span><br/>GIS &amp; Multimodal AI<br/>research / engineering.</span>
+      </h1>
+      <p style="margin-top:2rem; max-width:620px; color:rgba(26,26,26,.72); line-height:1.7">
+        <span class="lang-zh">香港科技大学（广州）计算媒体与艺术 MPhil，前中科院上海微系统所嵌入式工程师。关注 GIS 可视化、知识图谱、多模态检索与文化遗产计算。</span>
+        <span class="lang-en">MPhil student in Computational Media &amp; Arts at HKUST(GZ), formerly an embedded engineer at CAS SIMIT. I work across GIS visualization, knowledge graphs, multimodal retrieval, and computational heritage.</span>
+      </p>
+
+      <div style="margin-top:1.5rem; display:flex; gap:.55rem; flex-wrap:wrap">
+        <span class="chip">HKUST(GZ) · MPhil</span>
+        <span class="chip">VINCI 2025 · 1st author</span>
+        <span class="chip">CHI 2025 · co-author</span>
+        <span class="chip">4 patents + 1 SW&copy;</span>
+      </div>
+
+      <div style="margin-top:2rem; display:flex; gap:.75rem; flex-wrap:wrap">
+        <a onclick="goTo(1)" style="cursor:pointer; background:#9C0000; color:#fff; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
+          <span class="lang-zh">看 GISauto →</span><span class="lang-en">See GISauto →</span>
+        </a>
+        <a onclick="goTo(8)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
+          <span class="lang-zh">联系我</span><span class="lang-en">Get in touch</span>
+        </a>
+      </div>
+    </div>
+    <figure class="portrait-card" aria-label="Yusong Wang portrait">
+      <img src="assets/yusong_portrait.png" alt="Yusong Wang portrait" />
+      <figcaption>
+        <span>Yusong Wang</span>
+        <span>GIS · AI</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 2 · GISAUTO OVERVIEW (DARK)
+========================================================= -->
+<section class="slide ink grain" id="s2">
+  <div style="width:100%; max-width:1280px">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap">
+      <div>
+        <div class="eyebrow" style="color:#ff6b6b">GIS Project · 01</div>
+        <h2 class="display" style="font-size:clamp(2.5rem, 5vw, 5rem); margin-top:.75rem">GISauto</h2>
+        <p style="color:rgba(255,255,255,.65); margin-top:.5rem; font-size:1.05rem">
+          <span class="lang-zh">广西历史建筑多模态 GIS 平台</span>
+          <span class="lang-en">A multimodal GIS platform for Guangxi heritage</span>
+        </p>
+      </div>
+      <p style="max-width:440px; color:rgba(255,255,255,.72); line-height:1.7; font-size:.95rem">
+        <span class="lang-zh">前端 Vue 3 + Mars2D，后端 FastAPI + Neo4j，一键 Docker Compose。把 14 个城市、2,036 处建筑、9,636 个构件做成了可看、可搜、可对话的系统。</span>
+        <span class="lang-en">Vue 3 + Mars2D on the front, FastAPI + Neo4j on the back, shipped as a single Docker Compose. 14 cities, 2,036 buildings, 9,636 components — visible, searchable, and conversational.</span>
+      </p>
+    </div>
+
+    <div style="margin-top:3rem; display:grid; grid-template-columns:repeat(4, 1fr); gap:1.25rem">
+      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
+        <div class="stat-big" style="color:#ff6b6b">2,036</div>
+        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
+          <span class="lang-zh">历史建筑</span><span class="lang-en">BUILDINGS</span>
+        </div>
+      </div>
+      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
+        <div class="stat-big" style="color:#ff6b6b">9,636</div>
+        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
+          <span class="lang-zh">建筑构件</span><span class="lang-en">COMPONENTS</span>
+        </div>
+      </div>
+      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
+        <div class="stat-big" style="color:#ff6b6b">1,294</div>
+        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
+          <span class="lang-zh">地图坐标点</span><span class="lang-en">MAP POINTS</span>
+        </div>
+      </div>
+      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
+        <div class="stat-big" style="color:#ff6b6b">4</div>
+        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
+          <span class="lang-zh">检索通路</span><span class="lang-en">RETRIEVAL LANES</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="project-grid">
+      <div class="project-pillars">
+        <div style="padding:1.1rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+          <div style="color:#ffb36f; font-weight:700; font-size:.68rem; letter-spacing:.15em">01 · MAP + GRAPH</div>
+          <div style="margin-top:.65rem; font-family:'Noto Serif SC',serif; font-size:1rem">
+            <span class="lang-zh">地图与图谱并存</span><span class="lang-en">Map meets knowledge graph</span>
+          </div>
+          <p style="font-size:.76rem; color:rgba(255,255,255,.65); margin-top:.45rem; line-height:1.55">
+            <span class="lang-zh">Mars2D 打点联动 BuildingDetail，vis-network 展开建筑、构件、年代与城市关系。</span>
+            <span class="lang-en">Mars2D markers link to BuildingDetail; vis-network expands buildings, components, era, and city relations.</span>
+          </p>
+        </div>
+        <div style="padding:1.1rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+          <div style="color:#ffb36f; font-weight:700; font-size:.68rem; letter-spacing:.15em">02 · ZERO-SHOT VISION</div>
+          <div style="margin-top:.65rem; font-family:'Noto Serif SC',serif; font-size:1rem">
+            <span class="lang-zh">28 类构件检测</span><span class="lang-en">28-class detection</span>
+          </div>
+          <p style="font-size:.76rem; color:rgba(255,255,255,.65); margin-top:.45rem; line-height:1.55">
+            <span class="lang-zh">Grounding DINO 定位飞檐、斗拱、马头墙，CLIP 向量写回 Neo4j。</span>
+            <span class="lang-en">Grounding DINO localizes cornices, dougong, and horse-head walls; CLIP vectors write back to Neo4j.</span>
+          </p>
+        </div>
+        <div style="padding:1.1rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+        <div style="color:#ffb36f; font-weight:700; font-size:.68rem; letter-spacing:.15em">03 · RAG AGENT</div>
+          <div style="margin-top:.65rem; font-family:'Noto Serif SC',serif; font-size:1rem">
+            <span class="lang-zh">标准化 PDF 入库</span><span class="lang-en">Standardized ingestion</span>
+          </div>
+          <p style="font-size:.76rem; color:rgba(255,255,255,.65); margin-top:.45rem; line-height:1.55">
+            <span class="lang-zh">从 PDF 切片到向量补漏，幂等重跑自动跳过已完成项。</span>
+            <span class="lang-en">From PDF chunking to embedding gap-fill; idempotent reruns skip completed work.</span>
+          </p>
+        </div>
+        <div class="mini-flow-nav" style="grid-column:1/-1">
+          <button onclick="goTo(2)"><small>DETAIL 01</small><span class="lang-zh">系统架构图</span><span class="lang-en">Architecture</span></button>
+          <button onclick="goTo(3)"><small>DETAIL 02</small><span class="lang-zh">Agent 演示</span><span class="lang-en">Agent Demo</span></button>
+          <button onclick="goTo(4)"><small>DETAIL 03</small><span class="lang-zh">论文与成果</span><span class="lang-en">Papers</span></button>
+        </div>
+      </div>
+      <div class="visual-stack">
+        <div class="visual-card" style="grid-column:1/-1; min-height:155px">
+          <img src="assets/interface.jpg" alt="GISauto interface preview" />
+          <b>Interface</b>
+        </div>
+        <div class="visual-card">
+          <img src="assets/architecture.jpg" alt="GISauto architecture preview" />
+          <b>Architecture</b>
+        </div>
+        <div class="visual-card">
+          <img src="assets/case-study.jpg" alt="Heritage case study preview" />
+          <b>Case Study</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 3 · FLOWCHART 1 · SYSTEM ARCHITECTURE
+========================================================= -->
+<section class="slide paper grain" id="s3">
+  <div class="flow-wrap">
+    <div>
+      <div class="eyebrow">Architecture · 02</div>
+      <h2 class="display" style="font-size:2.5rem; margin-top:.75rem">
+        <span class="lang-zh">系统架构</span><span class="lang-en">System Architecture</span>
+      </h2>
+      <div class="rule" style="width:90px; margin-top:1rem"></div>
+      <p style="margin-top:1.25rem; color:rgba(26,26,26,.75); line-height:1.75; font-size:.95rem">
+        <span class="lang-zh">三层结构：Vue 3 + Mars2D 前端管地图与对话交互；FastAPI 层把问题路由到 5 个检索接口；Neo4j 存建筑 / 构件 / 文档三类节点，向量索引与关系遍历共同服务检索。</span>
+        <span class="lang-en">A three-tier system. Vue 3 + Mars2D handles map &amp; dialogue on the front. FastAPI routes each query across 5 retrieval endpoints. Neo4j holds Building / Component / Document nodes, serving retrieval through both vector indexes and graph traversal.</span>
+      </p>
+
+      <div style="margin-top:1.5rem; display:flex; flex-wrap:wrap; gap:.5rem">
+        <span class="chip">Vue 3 + Vite</span>
+        <span class="chip">Mars2D</span>
+        <span class="chip">FastAPI</span>
+        <span class="chip">Neo4j 5.x</span>
+        <span class="chip">Docker Compose</span>
+      </div>
+
+      <div style="margin-top:1.75rem; padding-left:1rem; border-left:3px solid #9C0000">
+        <div style="font-size:.75rem; letter-spacing:.18em; color:#9C0000; font-weight:700">KEY INSIGHT</div>
+        <p style="margin-top:.35rem; font-size:.9rem; color:rgba(26,26,26,.8); line-height:1.6; font-family:'Noto Serif SC',serif">
+          <span class="lang-zh">&ldquo;地图即入口，图谱即大脑，对话即指针。&rdquo;</span>
+          <span class="lang-en">&ldquo;Map is the entry, graph is the brain, dialogue is the pointer.&rdquo;</span>
+        </p>
+      </div>
+    </div>
+    <div class="flow-img">
+      <img src="assets/vinci_raw/s10_system.png" alt="System architecture flowchart" />
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 6 · AGENT CHAT DEMO
+========================================================= -->
+<section class="slide paper grain" id="s6">
+  <div style="width:100%; max-width:1280px; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center">
+    <div>
+      <div class="eyebrow">In-page Agent · 03</div>
+      <h2 class="display" style="font-size:2.6rem; margin-top:.75rem">
+        <span class="lang-zh">一个懂<span style="color:#9C0000">建筑 / 空间 / 图像</span>的研究伙伴。</span>
+        <span class="lang-en">A companion that knows <span style="color:#9C0000">buildings, space &amp; images</span>.</span>
+      </h2>
+      <div class="rule" style="width:90px; margin-top:1rem"></div>
+
+      <ul style="margin-top:1.5rem; list-style:none; padding:0; display:grid; gap:.85rem; font-size:.88rem; color:rgba(26,26,26,.8); line-height:1.65">
+        <li style="display:flex; gap:.75rem">
+          <span class="dot" style="margin-top:.55rem; flex-shrink:0"></span>
+          <span>
+            <b><span class="lang-zh">工具使用。</span><span class="lang-en">Tool use.</span></b>
+            <span class="lang-zh">chatStore 根据输入自动挑用 5 个后端接口（question / by-text-image / by-component / image-to-building / image-to-component）。</span>
+            <span class="lang-en">chatStore dispatches across 5 endpoints (question / by-text-image / by-component / image-to-building / image-to-component).</span>
+          </span>
+        </li>
+        <li style="display:flex; gap:.75rem">
+          <span class="dot" style="margin-top:.55rem; flex-shrink:0"></span>
+          <span>
+            <b><span class="lang-zh">多模态证据。</span><span class="lang-en">Grounded evidence.</span></b>
+            <span class="lang-zh">回复追溯到具体 Building / Component / Document 节点与 PDF 片段，不是凭空生成。</span>
+            <span class="lang-en">Each answer traces back to Neo4j nodes and PDF chunks — not hallucination.</span>
+          </span>
+        </li>
+        <li style="display:flex; gap:.75rem">
+          <span class="dot" style="margin-top:.55rem; flex-shrink:0"></span>
+          <span>
+            <b><span class="lang-zh">人机共探。</span><span class="lang-en">Human-AI loop.</span></b>
+            <span class="lang-zh">对话结果反向驱动地图点亮、图谱展开、构件墙筛选，形成闭环。</span>
+            <span class="lang-en">Replies drive the UI back: markers highlight, the graph expands, the tag-wall filters.</span>
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <div style="border-radius:18px; border:1px solid rgba(0,0,0,.06); background:#fff; padding:1.25rem; box-shadow:0 24px 60px -30px rgba(0,0,0,.25); display:flex; flex-direction:column; gap:.6rem; min-height:420px">
+      <div style="display:flex; align-items:center; gap:.5rem; font-size:.72rem; color:rgba(26,26,26,.55); padding-bottom:.5rem; border-bottom:1px dashed rgba(0,0,0,.08)">
+        <span style="width:8px; height:8px; border-radius:999px; background:#22c55e"></span>
+        <span>GISauto Agent</span>
+        <span style="margin-left:auto">DeepSeek-V3 &middot; 4-lane RAG</span>
+      </div>
+
+      <div class="bubble-user" style="align-self:flex-end; max-width:85%; border-radius:18px 18px 4px 18px; padding:.55rem .9rem; font-size:.88rem">
+        <span class="lang-zh">南宁有哪些带马头墙的民居？</span>
+        <span class="lang-en">Any Nanning vernacular houses with horse-head walls?</span>
+      </div>
+
+      <div class="bubble-bot" style="align-self:flex-start; max-width:92%; border-radius:18px 18px 18px 4px; padding:.55rem .9rem; font-size:.85rem; color:rgba(26,26,26,.88)">
+        <div style="font-size:.68rem; color:rgba(26,26,26,.45); margin-bottom:.3rem"><span class="lang-zh">检索路径</span><span class="lang-en">Retrieval</span></div>
+        <div style="display:flex; flex-wrap:wrap; gap:.3rem">
+          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">city: <span class="lang-zh">南宁</span><span class="lang-en">Nanning</span></span>
+          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">component: <span class="lang-zh">马头墙</span><span class="lang-en">horse-head wall</span></span>
+          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">BGE text</span>
+          <span class="chip" style="font-size:.66rem; padding:.15rem .5rem">CLIP image</span>
+        </div>
+      </div>
+
+      <div class="bubble-bot" style="align-self:flex-start; max-width:92%; border-radius:18px 18px 18px 4px; padding:.55rem .9rem; font-size:.85rem; color:rgba(26,26,26,.88)">
+        <p style="margin:0"><span class="lang-zh">命中 6 处，其中 3 处证据最强：</span><span class="lang-en">6 hits, top 3 by evidence:</span></p>
+        <ul style="margin:.3rem 0 .3rem 1.2rem; padding:0; color:rgba(26,26,26,.8); font-size:.82rem">
+          <li><span class="lang-zh">扬美古镇举人屋（清代 &middot; 砖木）</span><span class="lang-en">Yangmei Juren House (Qing &middot; brick-timber)</span></li>
+          <li><span class="lang-zh">灵水陈氏宗祠</span><span class="lang-en">Lingshui Chen Ancestral Hall</span></li>
+          <li><span class="lang-zh">黄氏民居</span><span class="lang-en">Huang Residence</span></li>
+        </ul>
+        <p style="margin:0; font-size:.68rem; color:rgba(26,26,26,.5)">
+          <span class="lang-zh">地图已高亮 &middot; 构件裁剪图已附</span>
+          <span class="lang-en">Markers highlighted &middot; component crops attached</span>
+        </p>
+      </div>
+
+      <div class="typing" style="align-self:flex-start"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 7 · PUBLICATIONS
+========================================================= -->
+<section class="slide paper grain" id="s7">
+  <div style="width:100%; max-width:1280px">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2.5rem">
+      <div>
+        <div class="eyebrow"><span class="lang-zh">学术产出</span><span class="lang-en">Publications</span> · 04</div>
+        <h2 class="display" style="font-size:2.8rem; margin-top:.75rem">
+          <span class="lang-zh">两篇会议论文 &middot; 四项发明专利</span>
+          <span class="lang-en">Two conference papers &middot; four patents</span>
+        </h2>
+      </div>
+      <div class="rule" style="flex:1; min-width:200px; margin-bottom:1rem"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:1.5rem">
+      <div class="card" style="background:linear-gradient(135deg, #9C0000 0%, #7a0000 100%); color:#fff; border:none">
+        <div class="eyebrow" style="color:rgba(255,255,255,.8)">First author &middot; VINCI 2025</div>
+        <h3 class="display" style="font-size:2rem; margin-top:.75rem">HeritageExplorer</h3>
+        <p style="font-size:.85rem; color:rgba(255,255,255,.85); line-height:1.7; margin-top:.75rem">
+          <span class="lang-zh">广州 831 处历史建筑的多模态交互式可视化与对话系统。量化评估在三类遗产任务中事实准确性稳定提升。GISauto 是其扩展至广西并工程化部署的版本。</span>
+          <span class="lang-en">An interactive visualization + dialogue system over 831 Guangzhou heritage buildings. Quantitative studies show stable gains in factual accuracy across three heritage tasks. GISauto is its Guangxi-scale, production-ready extension.</span>
+        </p>
+        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.15); font-size:.75rem; color:rgba(255,255,255,.8)">
+          DOI &middot; <a href="https://doi.org/10.1145/3769534.3769571" target="_blank" style="color:#fff; text-decoration:underline">10.1145/3769534.3769571</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow" style="font-size:.65rem">Co-author &middot; CHI 2025</div>
+        <h3 class="display" style="font-size:1.6rem; margin-top:.75rem">GenColor</h3>
+        <p style="font-size:.82rem; color:rgba(26,26,26,.7); line-height:1.7; margin-top:.75rem">
+          <span class="lang-zh">基于文生图扩散模型的生成式框架，自动提取与具体语境相关的设计配色方案。</span>
+          <span class="lang-en">A generative framework built on text-to-image diffusion that extracts context-specific color palettes for visual design.</span>
+        </p>
+        <div style="margin-top:1.25rem; display:flex; gap:.4rem; flex-wrap:wrap">
+          <span class="chip" style="font-size:.65rem">Diffusion</span>
+          <span class="chip" style="font-size:.65rem">Color Design</span>
+          <span class="chip" style="font-size:.65rem">HCI</span>
+        </div>
+      </div>
+
+      <div class="card" style="background:rgba(156,0,0,.04); border-color:rgba(156,0,0,.15)">
+        <div class="eyebrow" style="font-size:.65rem"><span class="lang-zh">知识产权</span><span class="lang-en">IP</span></div>
+        <div style="margin-top:.75rem; display:flex; align-items:baseline; gap:.5rem">
+          <div class="stat-big" style="font-size:3rem">4</div>
+          <div style="font-size:.82rem; color:rgba(26,26,26,.7)">
+            <span class="lang-zh">项发明专利</span><span class="lang-en">patents</span>
+          </div>
+        </div>
+        <div style="margin-top:.3rem; display:flex; align-items:baseline; gap:.5rem">
+          <div class="stat-big" style="font-size:3rem">1</div>
+          <div style="font-size:.82rem; color:rgba(26,26,26,.7)">
+            <span class="lang-zh">项软件著作权</span><span class="lang-en">software copyright</span>
+          </div>
+        </div>
+        <p style="margin-top:.9rem; font-size:.72rem; color:rgba(26,26,26,.6); line-height:1.6">
+          <span class="lang-zh">危化品云数据联动平台 &middot; 光伏故障诊断 &middot; 光伏电站监控 &middot; 异常定位方法</span>
+          <span class="lang-en">Hazardous-chemical cloud platform &middot; PV fault diagnosis &middot; PV station monitoring &middot; anomaly localization</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 8 · EXPERIENCE (HORIZONTAL TIMELINE, DARK)
+========================================================= -->
+<section class="slide ink grain" id="s8">
+  <div style="width:100%; max-width:1300px">
+    <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">经历</span><span class="lang-en">Experience</span> · 05</div>
+    <h2 class="display" style="font-size:2.8rem; margin-top:.75rem">
+      <span class="lang-zh">从电路到向量</span><span class="lang-en">From circuits to embeddings</span>
+    </h2>
+    <div class="rule" style="width:90px; margin-top:1rem; background:linear-gradient(90deg,#ff6b6b, rgba(255,107,107,0) 70%)"></div>
+
+    <div style="margin-top:5rem; position:relative">
+      <div style="position:absolute; left:0; right:0; top:8px; height:2px; background:linear-gradient(90deg, rgba(255,107,107,.15), rgba(255,107,107,.6), rgba(255,107,107,.15))"></div>
+
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; position:relative">
+        <div>
+          <div style="width:18px; height:18px; border-radius:999px; background:#ff6b6b; box-shadow:0 0 0 5px rgba(255,107,107,.18); margin-bottom:1.5rem"></div>
+          <div style="font-size:.72rem; color:rgba(255,255,255,.5); letter-spacing:.15em">2016 &mdash; 2020</div>
+          <h3 class="display" style="font-size:1.25rem; margin-top:.45rem">
+            <span class="lang-zh">广西大学 &middot; 本科</span><span class="lang-en">Guangxi University &middot; B.Eng</span>
+          </h3>
+          <p style="font-size:.78rem; color:rgba(255,255,255,.6); margin-top:.5rem; line-height:1.6">
+            <span class="lang-zh">电气工程及其自动化。参与两届互联网+大赛（智慧农业、光伏运维）。</span>
+            <span class="lang-en">Electrical Engineering &amp; Automation. Competed twice in the Internet+ contest (smart agriculture, PV O&amp;M).</span>
+          </p>
+        </div>
+        <div>
+          <div style="width:18px; height:18px; border-radius:999px; background:#ff6b6b; box-shadow:0 0 0 5px rgba(255,107,107,.18); margin-bottom:1.5rem"></div>
+          <div style="font-size:.72rem; color:rgba(255,255,255,.5); letter-spacing:.15em">2020 &mdash; 2022</div>
+          <h3 class="display" style="font-size:1.25rem; margin-top:.45rem">
+            <span class="lang-zh">中科院 &middot; 嵌入式工程师</span><span class="lang-en">CAS SIMIT &middot; Embedded</span>
+          </h3>
+          <p style="font-size:.78rem; color:rgba(255,255,255,.6); margin-top:.5rem; line-height:1.6">
+            <span class="lang-zh">无线水压表 / LoRa 测力 / 消防感知。原理图、MCU 固件、现场部署全流程。参与标准起草。</span>
+            <span class="lang-en">Wireless meters / LoRa sensors / fire-safety. Schematic to firmware to field. Co-authored industry standards.</span>
+          </p>
+        </div>
+        <div>
+          <div style="width:18px; height:18px; border-radius:999px; background:#ff6b6b; box-shadow:0 0 0 5px rgba(255,107,107,.18); margin-bottom:1.5rem"></div>
+          <div style="font-size:.72rem; color:rgba(255,255,255,.5); letter-spacing:.15em">2024 &mdash; 2025</div>
+          <h3 class="display" style="font-size:1.25rem; margin-top:.45rem">
+            <span class="lang-zh">HKUST(GZ) &middot; 研究</span><span class="lang-en">HKUST(GZ) &middot; Research</span>
+          </h3>
+          <p style="font-size:.78rem; color:rgba(255,255,255,.6); margin-top:.5rem; line-height:1.6">
+            <span class="lang-zh">HeritageExplorer 投稿 VINCI 2025 &middot; GenColor 合作 CHI 2025 &middot; GISauto 从 0 到 1 搭建。</span>
+            <span class="lang-en">HeritageExplorer at VINCI 2025 &middot; co-authored GenColor at CHI 2025 &middot; built GISauto from zero.</span>
+          </p>
+        </div>
+        <div>
+          <div style="width:18px; height:18px; border-radius:999px; background:#9C0000; box-shadow:0 0 0 5px rgba(156,0,0,.3); margin-bottom:1.5rem; animation:pulse 2s infinite"></div>
+          <div style="font-size:.72rem; color:rgba(255,255,255,.5); letter-spacing:.15em">2026 &mdash; <span class="lang-zh">至今</span><span class="lang-en">Now</span></div>
+          <h3 class="display" style="font-size:1.25rem; margin-top:.45rem">
+            <span class="lang-zh">下一站</span><span class="lang-en">What&apos;s next</span>
+          </h3>
+          <p style="font-size:.78rem; color:rgba(255,255,255,.6); margin-top:.5rem; line-height:1.6">
+            <span class="lang-zh">多模态 Agent 落地 &middot; 遗产叙事 &middot; 可解释 RAG。寻找全职或博士机会。</span>
+            <span class="lang-en">Multimodal agents in the wild &middot; heritage storytelling &middot; explainable RAG. Open to full-time or PhD.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <style>@keyframes pulse{0%,100%{box-shadow:0 0 0 5px rgba(156,0,0,.3)}50%{box-shadow:0 0 0 10px rgba(156,0,0,.0)}}</style>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 9 · OTHER PROJECTS
+========================================================= -->
+<section class="slide paper grain" id="s9">
+  <div style="width:100%; max-width:1300px">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2rem">
+      <div>
+        <div class="eyebrow"><span class="lang-zh">其他项目</span><span class="lang-en">Other Projects</span> · 06</div>
+        <h2 class="display" style="font-size:2.5rem; margin-top:.75rem">
+          <span class="lang-zh">硬件、物联网与赛事</span><span class="lang-en">Hardware, IoT &amp; Competitions</span>
+        </h2>
+      </div>
+      <div class="rule" style="flex:1; min-width:200px; margin-bottom:1rem"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="eyebrow" style="font-size:.6rem">01</span>
+          <span style="font-size:.7rem; color:rgba(26,26,26,.5)">2020 &mdash; 2022</span>
+        </div>
+        <h3 style="margin-top:.5rem; font-family:'Noto Serif SC',serif; font-size:1.05rem">
+          <span class="lang-zh">危化品云数据联动装置</span><span class="lang-en">Hazardous-chemical cloud sensor</span>
+        </h3>
+        <p style="font-size:.78rem; color:rgba(26,26,26,.7); margin-top:.5rem; line-height:1.6">
+          <span class="lang-zh">上海市科委 19511102801。CH4/CO2/温湿度 + 摄像头多传感器融合，危化品特征提取与场景识别。</span>
+          <span class="lang-en">STCSM #19511102801. Fused CH4/CO2/T&amp;H sensors with camera imagery for hazardous-chemical feature extraction.</span>
+        </p>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="eyebrow" style="font-size:.6rem">02</span>
+          <span style="font-size:.7rem; color:rgba(26,26,26,.5)">2020 &mdash; 2022</span>
+        </div>
+        <h3 style="margin-top:.5rem; font-family:'Noto Serif SC',serif; font-size:1.05rem">
+          <span class="lang-zh">消防管理智能感知设备</span><span class="lang-en">Smart fire-safety sensor</span>
+        </h3>
+        <p style="font-size:.78rem; color:rgba(26,26,26,.7); margin-top:.5rem; line-height:1.6">
+          <span class="lang-zh">上海市科委 19DZ12020027。场景自适应配置，CSMA/CA 载波侦听避免碰撞。</span>
+          <span class="lang-en">STCSM #19DZ12020027. Scene-adaptive configuration with CSMA/CA carrier sensing.</span>
+        </p>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="eyebrow" style="font-size:.6rem">03</span>
+          <span style="font-size:.7rem; color:rgba(26,26,26,.5)">2021 &mdash; 2022</span>
+        </div>
+        <h3 style="margin-top:.5rem; font-family:'Noto Serif SC',serif; font-size:1.05rem">
+          <span class="lang-zh">振弦式钢筋计无线测力</span><span class="lang-en">Vibrating-wire wireless force sensor</span>
+        </h3>
+        <p style="font-size:.78rem; color:rgba(26,26,26,.7); margin-top:.5rem; line-height:1.6">
+          <span class="lang-zh">基于 LoRa 为深基坑混凝土支撑轴力提供无线监测，按信号质量动态组网。</span>
+          <span class="lang-en">LoRa-based axial-force monitor for deep-pit struts, with signal-quality-driven relay placement.</span>
+        </p>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="eyebrow" style="font-size:.6rem">04</span>
+          <span style="font-size:.7rem; color:rgba(26,26,26,.5)">2020 &mdash; 2021</span>
+        </div>
+        <h3 style="margin-top:.5rem; font-family:'Noto Serif SC',serif; font-size:1.05rem">
+          <span class="lang-zh">虹桥站客流检测</span><span class="lang-en">Hongqiao passenger flow</span>
+        </h3>
+        <p style="font-size:.78rem; color:rgba(26,26,26,.7); margin-top:.5rem; line-height:1.6">
+          <span class="lang-zh">基于蓝牙的实时热力图，为高峰预警与后续规划提供依据。</span>
+          <span class="lang-en">Bluetooth-based real-time heatmaps informing peak-hour alerts and station planning.</span>
+        </p>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="eyebrow" style="font-size:.6rem">05</span>
+          <span style="font-size:.7rem; color:rgba(26,26,26,.5)">2019</span>
+        </div>
+        <h3 style="margin-top:.5rem; font-family:'Noto Serif SC',serif; font-size:1.05rem">
+          <span class="lang-zh">光伏运维平台</span><span class="lang-en">PV O&amp;M platform</span>
+        </h3>
+        <p style="font-size:.78rem; color:rgba(26,26,26,.7); margin-top:.5rem; line-height:1.6">
+          <span class="lang-zh">第五届&ldquo;互联网+&rdquo;大赛。基于物联网的光伏系统故障监测与修复平台。</span>
+          <span class="lang-en">5th Internet+ contest. An IoT platform for PV fault detection and remediation.</span>
+        </p>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span class="eyebrow" style="font-size:.6rem">06</span>
+          <span style="font-size:.7rem; color:rgba(26,26,26,.5)">2017</span>
+        </div>
+        <h3 style="margin-top:.5rem; font-family:'Noto Serif SC',serif; font-size:1.05rem">
+          <span class="lang-zh">智慧农业</span><span class="lang-en">Smart agriculture</span>
+        </h3>
+        <p style="font-size:.78rem; color:rgba(26,26,26,.7); margin-top:.5rem; line-height:1.6">
+          <span class="lang-zh">第三届&ldquo;互联网+&rdquo;大赛。果园病虫害检测与反馈管理平台。</span>
+          <span class="lang-en">3rd Internet+ contest. An orchard pest and disease feedback platform.</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 10 · SKILLS (DARK)
+========================================================= -->
+<section class="slide ink grain" id="s10">
+  <div style="width:100%; max-width:1300px">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2.5rem">
+      <div>
+        <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">工具链</span><span class="lang-en">Toolbox</span> · 07</div>
+        <h2 class="display" style="font-size:2.8rem; margin-top:.75rem">
+          <span class="lang-zh">从 PCB 到 Prompt</span><span class="lang-en">From PCB to Prompt</span>
+        </h2>
+      </div>
+      <div class="rule" style="flex:1; min-width:200px; margin-bottom:1rem; background:linear-gradient(90deg,#ff6b6b, rgba(255,107,107,0) 70%)"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:1rem">
+      <div style="padding:1.5rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+        <div style="color:#ff6b6b; font-weight:700; font-size:.72rem; letter-spacing:.18em">
+          <span class="lang-zh">多模态 AI &amp; 大模型</span><span class="lang-en">MULTIMODAL AI &amp; LLMS</span>
+        </div>
+        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.4rem">
+          <span class="chip">Chinese-CLIP</span><span class="chip">BGE embeddings</span>
+          <span class="chip">Grounding DINO</span><span class="chip">Qwen-VL</span>
+          <span class="chip">DeepSeek-V3</span><span class="chip">GPT</span><span class="chip">Claude API</span>
+          <span class="chip">Prompt Engineering</span><span class="chip">Agent Workflow</span>
+        </div>
+      </div>
+      <div style="padding:1.5rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+        <div style="color:#ff6b6b; font-weight:700; font-size:.72rem; letter-spacing:.18em">
+          <span class="lang-zh">GIS &amp; 可视化</span><span class="lang-en">GIS &amp; VISUALIZATION</span>
+        </div>
+        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.4rem">
+          <span class="chip">Mars2D</span><span class="chip">Cesium</span><span class="chip">Leaflet</span>
+          <span class="chip"><span class="lang-zh">高德 API</span><span class="lang-en">Amap API</span></span>
+          <span class="chip">ECharts</span><span class="chip">vis-network</span><span class="chip">Cytoscape</span>
+        </div>
+      </div>
+      <div style="padding:1.5rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+        <div style="color:#ff6b6b; font-weight:700; font-size:.72rem; letter-spacing:.18em">
+          <span class="lang-zh">图谱 &amp; 检索</span><span class="lang-en">GRAPH &amp; RETRIEVAL</span>
+        </div>
+        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.4rem">
+          <span class="chip">Neo4j &middot; Cypher</span>
+          <span class="chip"><span class="lang-zh">向量索引</span><span class="lang-en">Vector Index</span></span>
+          <span class="chip">RAG</span>
+          <span class="chip"><span class="lang-zh">多通道融合</span><span class="lang-en">Multi-lane Fusion</span></span>
+        </div>
+      </div>
+      <div style="padding:1.5rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+        <div style="color:#ff6b6b; font-weight:700; font-size:.72rem; letter-spacing:.18em">
+          <span class="lang-zh">Web &amp; 部署</span><span class="lang-en">WEB &amp; DEPLOYMENT</span>
+        </div>
+        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.4rem">
+          <span class="chip">Vue 3 + Vite</span><span class="chip">TypeScript</span>
+          <span class="chip">FastAPI</span><span class="chip">Docker Compose</span><span class="chip">Nginx</span>
+        </div>
+      </div>
+      <div style="padding:1.5rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+        <div style="color:#ff6b6b; font-weight:700; font-size:.72rem; letter-spacing:.18em">
+          <span class="lang-zh">编程 &amp; 嵌入式</span><span class="lang-en">PROGRAMMING &amp; EMBEDDED</span>
+        </div>
+        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.4rem">
+          <span class="chip">Python</span><span class="chip">C / C++</span><span class="chip">TypeScript</span>
+          <span class="chip">HTML</span>
+          <span class="chip"><span class="lang-zh">汇编</span><span class="lang-en">Assembly</span></span>
+          <span class="chip">IAR Workbench</span>
+        </div>
+      </div>
+      <div style="padding:1.5rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
+        <div style="color:#ff6b6b; font-weight:700; font-size:.72rem; letter-spacing:.18em">
+          <span class="lang-zh">设计 &amp; 建模</span><span class="lang-en">DESIGN &amp; MODELING</span>
+        </div>
+        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.4rem">
+          <span class="chip">Altium Designer</span><span class="chip">SolidWorks</span>
+          <span class="chip">Photoshop</span><span class="chip">TouchDesigner</span><span class="chip">Blender</span>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:2rem; font-size:.85rem; color:rgba(255,255,255,.55)">
+      <span class="lang-zh">语言：中文母语 &middot; 英语 CET-6 / IELTS 6.5</span>
+      <span class="lang-en">Languages: Chinese (native) &middot; English (CET-6, IELTS 6.5)</span>
+    </p>
+  </div>
+</section>
+
+<!-- =========================================================
+  SLIDE 11 · CONTACT
+========================================================= -->
+<section class="slide paper grain" id="s11">
+  <div style="width:100%; max-width:1100px; text-align:left">
+    <div class="eyebrow"><span class="lang-zh">联系</span><span class="lang-en">Contact</span> · 08</div>
+    <h2 class="display" style="font-size:clamp(3rem, 5vw, 5rem); margin-top:1rem; line-height:1.05">
+      <span class="lang-zh">一起把<span style="color:#9C0000">历史</span><br/>装进<span style="color:#9C0000">下一个模型</span>。</span>
+      <span class="lang-en">Let&apos;s put <span style="color:#9C0000">history</span><br/>into the <span style="color:#9C0000">next model</span>.</span>
+    </h2>
+    <div class="rule" style="width:120px; margin-top:1.25rem"></div>
+
+    <div style="margin-top:2.5rem; display:grid; grid-template-columns:repeat(3, 1fr); gap:1.5rem">
+      <a href="mailto:ywang677@connect.hkust-gz.edu.cn" style="display:block; padding:1.25rem; border:1px solid rgba(156,0,0,.2); border-radius:14px; background:rgba(255,255,255,.6); text-decoration:none; color:inherit; transition:all .2s" onmouseover="this.style.background='#9C0000'; this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.6)'; this.style.color='inherit'">
+        <div class="eyebrow" style="font-size:.62rem">Email</div>
+        <div style="margin-top:.5rem; font-family:'JetBrains Mono',monospace; font-size:.82rem; word-break:break-all">ywang677@connect.hkust-gz.edu.cn</div>
+      </a>
+      <a href="tel:+8618877145317" style="display:block; padding:1.25rem; border:1px solid rgba(156,0,0,.2); border-radius:14px; background:rgba(255,255,255,.6); text-decoration:none; color:inherit; transition:all .2s" onmouseover="this.style.background='#9C0000'; this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.6)'; this.style.color='inherit'">
+        <div class="eyebrow" style="font-size:.62rem"><span class="lang-zh">电话</span><span class="lang-en">Phone</span></div>
+        <div style="margin-top:.5rem; font-family:'JetBrains Mono',monospace; font-size:1rem">(+86) 188 7714 5317</div>
+      </a>
+      <div style="display:block; padding:1.25rem; border:1px solid rgba(156,0,0,.2); border-radius:14px; background:rgba(255,255,255,.6)">
+        <div class="eyebrow" style="font-size:.62rem"><span class="lang-zh">所在地</span><span class="lang-en">Based in</span></div>
+        <div style="margin-top:.5rem; font-family:'Noto Serif SC',serif; font-size:1rem">
+          <span class="lang-zh">广西南宁 / 广州</span>
+          <span class="lang-en">Nanning &middot; Guangzhou</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:2.25rem; display:flex; gap:.75rem; flex-wrap:wrap">
+      <a href="mailto:ywang677@connect.hkust-gz.edu.cn" style="cursor:pointer; background:#9C0000; color:#fff; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600; text-decoration:none">
+        <span class="lang-zh">发邮件 &rarr;</span><span class="lang-en">Email me &rarr;</span>
+      </a>
+      <a href="CV_Yusong_Wang.docx" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600; text-decoration:none">
+        <span class="lang-zh">下载简历 (.docx)</span><span class="lang-en">Download CV (.docx)</span>
+      </a>
+      <a onclick="goTo(0)" style="cursor:pointer; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600; color:rgba(26,26,26,.6)">
+        &larr; <span class="lang-zh">回到开头</span><span class="lang-en">Back to top</span>
+      </a>
+    </div>
+
+    <div style="margin-top:4rem; padding-top:1.25rem; border-top:1px solid rgba(0,0,0,.08); display:flex; justify-content:space-between; font-size:.72rem; color:rgba(26,26,26,.5)">
+      <span>&copy; 2026 Yusong Wang &middot; <span>王钰淞</span></span>
+      <span><span class="lang-zh">HTML + Tailwind 手搓</span><span class="lang-en">Hand-built with HTML + Tailwind</span></span>
+    </div>
+  </div>
+</section>
+
+</div><!-- /.deck -->
+
+<script>
+  const body = document.body;
+  const deck = document.getElementById('deck');
+  const rail = document.getElementById('rail');
+  const progress = document.getElementById('progress');
+  const slideCounter = document.getElementById('slideCounter');
+  const navLinks = document.querySelectorAll('.nav-link');
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const railLabels = [
+    ['首页', 'Home'],
+    ['GISauto', 'GISauto'],
+    ['架构', 'Architecture'],
+    ['Agent', 'Agent'],
+    ['论文', 'Papers'],
+    ['经历', 'Timeline'],
+    ['项目', 'Projects'],
+    ['技能', 'Skills'],
+    ['联系', 'Contact']
+  ];
+  const navStops = [
+    { start: 0, end: 0 },
+    { start: 1, end: 1 },
+    { start: 2, end: 2 },
+    { start: 4, end: 4 },
+    { start: 5, end: 7 },
+    { start: 8, end: 8 }
+  ];
+
+  // Build rail dots
+  for (let i = 0; i < total; i++) {
+    const b = document.createElement('button');
+    b.dataset.i = i;
+    b.dataset.num = String(i + 1).padStart(2, '0');
+    b.setAttribute('aria-label', railLabels[i]?.[0] || `Slide ${i + 1}`);
+    const label = document.createElement('span');
+    label.innerHTML = `<span class="lang-zh">${railLabels[i]?.[0] || i + 1}</span><span class="lang-en">${railLabels[i]?.[1] || i + 1}</span>`;
+    b.appendChild(label);
+    b.addEventListener('click', () => goTo(i));
+    rail.appendChild(b);
+  }
+
+  navLinks.forEach((link) => {
+    link.addEventListener('click', () => goTo(Number(link.dataset.target || 0)));
+  });
+
+  function goTo(i) {
+    i = Math.max(0, Math.min(total - 1, i));
+    const isMobile = window.matchMedia('(max-width: 900px)').matches;
+    const target = slides[i];
+    if (isMobile) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      deck.scrollTo({ left: i * window.innerWidth, behavior: 'smooth' });
+    }
+  }
+  window.goTo = goTo;
+
+  // Current slide tracking
+  let current = 0;
+  function setActive(i) {
+    current = i;
+    rail.querySelectorAll('button').forEach((b, idx) => {
+      b.classList.toggle('active', idx === i);
+    });
+    navLinks.forEach((link, idx) => {
+      const stop = navStops[idx];
+      link.classList.toggle('active', !!stop && i >= stop.start && i <= stop.end);
+    });
+    if (slideCounter) slideCounter.textContent = `${String(i + 1).padStart(2, '0')}/${String(total).padStart(2, '0')}`;
+    progress.style.width = ((i + 1) / total * 100) + '%';
+  }
+  setActive(0);
+
+  deck.addEventListener('scroll', () => {
+    const idx = Math.round(deck.scrollLeft / window.innerWidth);
+    if (idx !== current) setActive(idx);
+  }, { passive: true });
+
+  // Wheel: vertical wheel -> horizontal scroll on desktop
+  deck.addEventListener('wheel', (e) => {
+    if (window.matchMedia('(max-width: 900px)').matches) return;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      e.preventDefault();
+      deck.scrollLeft += e.deltaY;
+    }
+  }, { passive: false });
+
+  // Keyboard
+  window.addEventListener('keydown', (e) => {
+    if (window.matchMedia('(max-width: 900px)').matches) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault(); goTo(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); goTo(current - 1);
+    } else if (e.key === 'Home') {
+      goTo(0);
+    } else if (e.key === 'End') {
+      goTo(total - 1);
+    }
+  });
+
+  // Language
+  const langBtn = document.getElementById('langBtn');
+  const saved = localStorage.getItem('lang');
+  if (saved === 'en' || saved === 'zh') body.dataset.lang = saved;
+  langBtn.addEventListener('click', () => {
+    const next = body.dataset.lang === 'zh' ? 'en' : 'zh';
+    body.dataset.lang = next;
+    document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
+    localStorage.setItem('lang', next);
+  });
+
+  // Window resize: snap to current
+  window.addEventListener('resize', () => {
+    if (window.matchMedia('(max-width: 900px)').matches) return;
+    deck.scrollLeft = current * window.innerWidth;
+  });
+</script>
+</body>
+</html>
