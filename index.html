@@ -426,20 +426,18 @@
     gap:.65rem;
   }
   .pillar-card{
-    padding:.75rem .9rem;
+    padding:.85rem 1rem;
     border:1px solid rgba(255,255,255,.1);
     border-radius:12px;
     background:rgba(255,255,255,.04);
-    cursor:pointer;
-    transition:all .2s ease;
+    transition:border-color .2s ease, background .2s ease;
     display:flex;
     flex-direction:column;
-    gap:.3rem;
+    gap:.35rem;
   }
   .pillar-card:hover{
-    background:rgba(156,0,0,.18);
-    border-color:rgba(255,107,107,.4);
-    transform:translateY(-2px);
+    background:rgba(255,255,255,.06);
+    border-color:rgba(255,107,107,.3);
   }
   .pillar-card small{
     color:#ffb36f;
@@ -447,10 +445,16 @@
     font-size:.6rem;
     letter-spacing:.16em;
   }
-  .pillar-card span{
+  .pillar-card .pillar-title{
     font-family:'Noto Serif SC',serif;
-    font-size:.88rem;
-    color:rgba(255,255,255,.9);
+    font-size:.95rem;
+    color:rgba(255,255,255,.92);
+  }
+  .pillar-card .pillar-desc{
+    margin:.15rem 0 0;
+    font-size:.72rem;
+    line-height:1.55;
+    color:rgba(255,255,255,.62);
   }
   .mini-flow-nav{
     display:grid;
@@ -740,17 +744,29 @@
         <div><b>4</b><span><span class="lang-zh">检索通路</span><span class="lang-en">RETRIEVAL LANES</span></span></div>
       </div>
       <div class="pillar-strip">
-        <div class="pillar-card" onclick="goTo(2)">
+        <div class="pillar-card">
           <small>01 · MAP + GRAPH</small>
-          <span class="lang-zh">地图与图谱并存</span><span class="lang-en">Map meets graph</span>
+          <span class="pillar-title lang-zh">地图与图谱并存</span><span class="pillar-title lang-en">Map meets graph</span>
+          <p class="pillar-desc">
+            <span class="lang-zh">Mars2D 打点联动 BuildingDetail，vis-network 展开建筑 / 构件 / 年代 / 城市的关系。</span>
+            <span class="lang-en">Mars2D markers link to BuildingDetail; vis-network unfolds building / component / era / city relations.</span>
+          </p>
         </div>
-        <div class="pillar-card" onclick="goTo(3)">
+        <div class="pillar-card">
           <small>02 · RAG AGENT</small>
-          <span class="lang-zh">4 通路多模态检索</span><span class="lang-en">4-lane multimodal RAG</span>
+          <span class="pillar-title lang-zh">4 通路多模态检索</span><span class="pillar-title lang-en">4-lane multimodal RAG</span>
+          <p class="pillar-desc">
+            <span class="lang-zh">关键词 + BGE 文本向量 + CLIP 图像 + CLIP 构件四路并行，DeepSeek-V3 融合答复。</span>
+            <span class="lang-en">Keyword + BGE text + CLIP image + CLIP component lanes fused by DeepSeek-V3.</span>
+          </p>
         </div>
-        <div class="pillar-card" onclick="goTo(4)">
+        <div class="pillar-card">
           <small>03 · ZERO-SHOT VISION</small>
-          <span class="lang-zh">28 类构件检测</span><span class="lang-en">28-class detection</span>
+          <span class="pillar-title lang-zh">28 类构件检测</span><span class="pillar-title lang-en">28-class detection</span>
+          <p class="pillar-desc">
+            <span class="lang-zh">Grounding DINO 定位飞檐、斗拱、马头墙，CLIP 向量写回 Neo4j 供图像检索。</span>
+            <span class="lang-en">Grounding DINO localizes cornices, dougong, horse-head walls; CLIP vectors write back to Neo4j.</span>
+          </p>
         </div>
       </div>
     </div>
