@@ -299,6 +299,159 @@
   .hero-shot::after{
     background:linear-gradient(180deg, transparent 55%, rgba(10,0,0,.72)) !important;
   }
+
+  /* GISauto slide redesigned layout */
+  .gisauto-wrap{
+    width:100%;
+    max-width:1400px;
+    display:flex;
+    flex-direction:column;
+    gap:1.25rem;
+  }
+  .gisauto-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:2rem;
+    flex-wrap:wrap;
+  }
+  .gisauto-title{
+    font-size:clamp(2.2rem, 4vw, 3.4rem);
+    margin-top:.4rem;
+    line-height:1;
+  }
+  .gisauto-sub{
+    color:rgba(255,255,255,.65);
+    margin-top:.4rem;
+    font-size:1rem;
+  }
+  .gisauto-intro{
+    max-width:460px;
+    color:rgba(255,255,255,.72);
+    line-height:1.65;
+    font-size:.9rem;
+    margin:0;
+  }
+  .hero-shot-full{
+    position:relative;
+    width:100%;
+    margin:0;
+    border-radius:22px;
+    overflow:hidden;
+    background:
+      radial-gradient(900px 400px at 30% 0%, rgba(156,0,0,.18), transparent 60%),
+      linear-gradient(180deg, #0a0608 0%, #1a0d0f 100%);
+    border:1px solid rgba(255,107,107,.22);
+    box-shadow:
+      0 0 0 1px rgba(156,0,0,.16),
+      0 40px 110px -30px rgba(156,0,0,.55),
+      0 20px 60px -22px rgba(0,0,0,.75);
+    transition:transform .35s ease, box-shadow .35s ease;
+  }
+  .hero-shot-full:hover{
+    transform:translateY(-3px);
+    box-shadow:
+      0 0 0 1px rgba(255,107,107,.36),
+      0 50px 130px -28px rgba(156,0,0,.7),
+      0 24px 70px -20px rgba(0,0,0,.8);
+  }
+  .hero-shot-full img{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:58vh;
+    object-fit:contain;
+    object-position:center;
+  }
+  .hero-shot-full figcaption{
+    position:absolute;
+    left:1.25rem;
+    bottom:1rem;
+    right:1.25rem;
+    display:flex;
+    align-items:center;
+    gap:.8rem;
+    flex-wrap:wrap;
+    pointer-events:none;
+  }
+  .hero-shot-full .hero-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.7rem;
+    font-weight:800;
+    letter-spacing:.24em;
+    padding:.38rem .8rem;
+    background:#9C0000;
+    color:#fff;
+    border-radius:999px;
+    box-shadow:0 8px 24px -10px rgba(156,0,0,.9);
+  }
+  .hero-shot-full .hero-desc{
+    font-size:.78rem;
+    color:rgba(255,255,255,.82);
+    letter-spacing:.08em;
+    text-shadow:0 2px 10px rgba(0,0,0,.8);
+  }
+  .gisauto-footer{
+    display:grid;
+    grid-template-columns:1.05fr 1.4fr;
+    gap:1.5rem;
+    align-items:stretch;
+  }
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:.75rem;
+  }
+  .stat-strip > div{
+    border-left:2px solid #9C0000;
+    padding:.5rem .8rem;
+  }
+  .stat-strip b{
+    font-family:'Noto Serif SC',serif;
+    font-size:1.55rem;
+    color:#ff6b6b;
+    line-height:1;
+    display:block;
+  }
+  .stat-strip span{
+    font-size:.64rem;
+    color:rgba(255,255,255,.55);
+    margin-top:.35rem;
+    letter-spacing:.12em;
+    display:block;
+  }
+  .pillar-strip{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:.65rem;
+  }
+  .pillar-card{
+    padding:.75rem .9rem;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    cursor:pointer;
+    transition:all .2s ease;
+    display:flex;
+    flex-direction:column;
+    gap:.3rem;
+  }
+  .pillar-card:hover{
+    background:rgba(156,0,0,.18);
+    border-color:rgba(255,107,107,.4);
+    transform:translateY(-2px);
+  }
+  .pillar-card small{
+    color:#ffb36f;
+    font-weight:700;
+    font-size:.6rem;
+    letter-spacing:.16em;
+  }
+  .pillar-card span{
+    font-family:'Noto Serif SC',serif;
+    font-size:.88rem;
+    color:rgba(255,255,255,.9);
+  }
   .mini-flow-nav{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -448,6 +601,10 @@
     .portrait-card img{height:168px; border-radius:14px}
     .portrait-card figcaption{display:none}
     .visual-stack,.mini-flow-nav,.project-grid,.project-pillars{grid-template-columns:1fr}
+    .gisauto-footer{grid-template-columns:1fr}
+    .stat-strip{grid-template-columns:repeat(2,1fr)}
+    .pillar-strip{grid-template-columns:1fr}
+    .hero-shot-full img{max-height:none}
     .hint{display:none}
     .flow-wrap{grid-template-columns:1fr}
     .flow-img img{max-height:60vh}
@@ -551,91 +708,49 @@
   SLIDE 2 · GISAUTO OVERVIEW (DARK)
 ========================================================= -->
 <section class="slide ink grain" id="s2">
-  <div style="width:100%; max-width:1280px">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap">
+  <div class="gisauto-wrap">
+    <div class="gisauto-head">
       <div>
         <div class="eyebrow" style="color:#ff6b6b">GIS Project · 01</div>
-        <h2 class="display" style="font-size:clamp(2.5rem, 5vw, 5rem); margin-top:.75rem">GISauto</h2>
-        <p style="color:rgba(255,255,255,.65); margin-top:.5rem; font-size:1.05rem">
+        <h2 class="display gisauto-title">GISauto</h2>
+        <p class="gisauto-sub">
           <span class="lang-zh">广西历史建筑多模态 GIS 平台</span>
           <span class="lang-en">A multimodal GIS platform for Guangxi heritage</span>
         </p>
       </div>
-      <p style="max-width:440px; color:rgba(255,255,255,.72); line-height:1.7; font-size:.95rem">
-        <span class="lang-zh">前端 Vue 3 + Mars2D，后端 FastAPI + Neo4j，一键 Docker Compose。把 14 个城市、2,036 处建筑、9,636 个构件做成了可看、可搜、可对话的系统。</span>
-        <span class="lang-en">Vue 3 + Mars2D on the front, FastAPI + Neo4j on the back, shipped as a single Docker Compose. 14 cities, 2,036 buildings, 9,636 components — visible, searchable, and conversational.</span>
+      <p class="gisauto-intro">
+        <span class="lang-zh">前端 Vue 3 + Mars2D，后端 FastAPI + Neo4j，一键 Docker Compose。14 个城市、2,036 处建筑、9,636 个构件 — 可看、可搜、可对话。</span>
+        <span class="lang-en">Vue 3 + Mars2D on the front, FastAPI + Neo4j on the back, single Docker Compose. 14 cities, 2,036 buildings, 9,636 components — visible, searchable, conversational.</span>
       </p>
     </div>
 
-    <div style="margin-top:3rem; display:grid; grid-template-columns:repeat(4, 1fr); gap:1.25rem">
-      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
-        <div class="stat-big" style="color:#ff6b6b">2,036</div>
-        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
-          <span class="lang-zh">历史建筑</span><span class="lang-en">BUILDINGS</span>
-        </div>
-      </div>
-      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
-        <div class="stat-big" style="color:#ff6b6b">9,636</div>
-        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
-          <span class="lang-zh">建筑构件</span><span class="lang-en">COMPONENTS</span>
-        </div>
-      </div>
-      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
-        <div class="stat-big" style="color:#ff6b6b">1,294</div>
-        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
-          <span class="lang-zh">地图坐标点</span><span class="lang-en">MAP POINTS</span>
-        </div>
-      </div>
-      <div style="border-left:2px solid #9C0000; padding:1rem 1.25rem">
-        <div class="stat-big" style="color:#ff6b6b">4</div>
-        <div style="font-size:.8rem; color:rgba(255,255,255,.55); margin-top:.5rem; letter-spacing:.1em">
-          <span class="lang-zh">检索通路</span><span class="lang-en">RETRIEVAL LANES</span>
-        </div>
-      </div>
-    </div>
+    <figure class="hero-shot-full">
+      <img src="assets/gisauto_hero.png" alt="GISauto live interface — Heritage Explorer dashboard" />
+      <figcaption>
+        <span class="hero-tag">LIVE INTERFACE</span>
+        <span class="hero-desc">Heritage Explorer · <span class="lang-zh">交互式地图 · 知识图谱 · AI 对话</span><span class="lang-en">Map · Knowledge Graph · AI Chat</span></span>
+      </figcaption>
+    </figure>
 
-    <div class="project-grid">
-      <div class="project-pillars">
-        <div style="padding:1.1rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
-          <div style="color:#ffb36f; font-weight:700; font-size:.68rem; letter-spacing:.15em">01 · MAP + GRAPH</div>
-          <div style="margin-top:.65rem; font-family:'Noto Serif SC',serif; font-size:1rem">
-            <span class="lang-zh">地图与图谱并存</span><span class="lang-en">Map meets knowledge graph</span>
-          </div>
-          <p style="font-size:.76rem; color:rgba(255,255,255,.65); margin-top:.45rem; line-height:1.55">
-            <span class="lang-zh">Mars2D 打点联动 BuildingDetail，vis-network 展开建筑、构件、年代与城市关系。</span>
-            <span class="lang-en">Mars2D markers link to BuildingDetail; vis-network expands buildings, components, era, and city relations.</span>
-          </p>
-        </div>
-        <div style="padding:1.1rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
-          <div style="color:#ffb36f; font-weight:700; font-size:.68rem; letter-spacing:.15em">02 · ZERO-SHOT VISION</div>
-          <div style="margin-top:.65rem; font-family:'Noto Serif SC',serif; font-size:1rem">
-            <span class="lang-zh">28 类构件检测</span><span class="lang-en">28-class detection</span>
-          </div>
-          <p style="font-size:.76rem; color:rgba(255,255,255,.65); margin-top:.45rem; line-height:1.55">
-            <span class="lang-zh">Grounding DINO 定位飞檐、斗拱、马头墙，CLIP 向量写回 Neo4j。</span>
-            <span class="lang-en">Grounding DINO localizes cornices, dougong, and horse-head walls; CLIP vectors write back to Neo4j.</span>
-          </p>
-        </div>
-        <div style="padding:1.1rem; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.03)">
-        <div style="color:#ffb36f; font-weight:700; font-size:.68rem; letter-spacing:.15em">03 · RAG AGENT</div>
-          <div style="margin-top:.65rem; font-family:'Noto Serif SC',serif; font-size:1rem">
-            <span class="lang-zh">标准化 PDF 入库</span><span class="lang-en">Standardized ingestion</span>
-          </div>
-          <p style="font-size:.76rem; color:rgba(255,255,255,.65); margin-top:.45rem; line-height:1.55">
-            <span class="lang-zh">从 PDF 切片到向量补漏，幂等重跑自动跳过已完成项。</span>
-            <span class="lang-en">From PDF chunking to embedding gap-fill; idempotent reruns skip completed work.</span>
-          </p>
-        </div>
-        <div class="mini-flow-nav" style="grid-column:1/-1">
-          <button onclick="goTo(2)"><small>DETAIL 01</small><span class="lang-zh">系统架构图</span><span class="lang-en">Architecture</span></button>
-          <button onclick="goTo(3)"><small>DETAIL 02</small><span class="lang-zh">Agent 演示</span><span class="lang-en">Agent Demo</span></button>
-          <button onclick="goTo(4)"><small>DETAIL 03</small><span class="lang-zh">论文与成果</span><span class="lang-en">Papers</span></button>
-        </div>
+    <div class="gisauto-footer">
+      <div class="stat-strip">
+        <div><b>2,036</b><span><span class="lang-zh">历史建筑</span><span class="lang-en">BUILDINGS</span></span></div>
+        <div><b>9,636</b><span><span class="lang-zh">建筑构件</span><span class="lang-en">COMPONENTS</span></span></div>
+        <div><b>1,294</b><span><span class="lang-zh">地图点</span><span class="lang-en">MAP POINTS</span></span></div>
+        <div><b>4</b><span><span class="lang-zh">检索通路</span><span class="lang-en">RETRIEVAL LANES</span></span></div>
       </div>
-      <div class="visual-stack">
-        <div class="visual-card hero-shot" style="grid-column:1/-1; min-height:360px">
-          <img src="assets/gisauto_hero.png" alt="GISauto live interface — Heritage Explorer dashboard" />
-          <b>Live Interface · Heritage Explorer</b>
+      <div class="pillar-strip">
+        <div class="pillar-card" onclick="goTo(2)">
+          <small>01 · MAP + GRAPH</small>
+          <span class="lang-zh">地图与图谱并存</span><span class="lang-en">Map meets graph</span>
+        </div>
+        <div class="pillar-card" onclick="goTo(3)">
+          <small>02 · RAG AGENT</small>
+          <span class="lang-zh">4 通路多模态检索</span><span class="lang-en">4-lane multimodal RAG</span>
+        </div>
+        <div class="pillar-card" onclick="goTo(4)">
+          <small>03 · ZERO-SHOT VISION</small>
+          <span class="lang-zh">28 类构件检测</span><span class="lang-en">28-class detection</span>
         </div>
       </div>
     </div>
