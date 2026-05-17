@@ -68,6 +68,7 @@
     justify-content:center;
     padding:3.5rem clamp(3rem,5vw,6rem) 5rem clamp(12rem,14vw,14rem);
     overflow:hidden;
+    isolation:isolate;
   }
 
   /* Paper + grain */
@@ -86,6 +87,7 @@
     pointer-events:none;
     mix-blend-mode:multiply;
     opacity:.6;
+    z-index:1;
   }
   .ink{
     background:
@@ -95,6 +97,80 @@
     color:#fff
   }
   .ink.grain::before{background-image:radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)}
+  .paper::after,
+  .ink::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+  }
+  .paper::after{
+    opacity:.78;
+    background:
+      radial-gradient(ellipse at 8% 82%, rgba(156,0,0,.12) 0%, transparent 42%),
+      radial-gradient(ellipse at 82% 18%, rgba(31,111,104,.16) 0%, transparent 46%),
+      conic-gradient(from 215deg at 48% 52%, transparent 0 18%, rgba(217,145,82,.16) 25%, transparent 36%, rgba(31,111,104,.13) 52%, transparent 66%, rgba(156,0,0,.1) 82%, transparent 100%),
+      repeating-linear-gradient(120deg, rgba(31,111,104,.065) 0 1px, transparent 1px 68px);
+    filter:saturate(1.05);
+    animation:rb-aurora-field 18s ease-in-out infinite alternate;
+    mask-image:linear-gradient(90deg, transparent 0%, #000 8%, #000 94%, transparent 100%);
+  }
+  .ink::after{
+    opacity:.82;
+    background:
+      radial-gradient(ellipse at 76% 16%, rgba(31,111,104,.34) 0%, transparent 48%),
+      radial-gradient(ellipse at 18% 84%, rgba(156,0,0,.38) 0%, transparent 52%),
+      linear-gradient(112deg, transparent 0 22%, rgba(255,107,107,.08) 23%, transparent 32% 100%),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 76px);
+    mix-blend-mode:screen;
+    animation:rb-light-rays 16s ease-in-out infinite alternate;
+  }
+  @keyframes rb-aurora-field{
+    from{background-position:0% 0%, 0% 0%, 40% 50%, 0 0; transform:scale(1)}
+    to{background-position:4% -2%, -5% 4%, 58% 45%, 34px -22px; transform:scale(1.025)}
+  }
+  @keyframes rb-light-rays{
+    from{background-position:0% 0%, 0% 0%, -80px 0, 0 0; transform:translate3d(0,0,0)}
+    to{background-position:-3% 4%, 5% -3%, 140px 0, 28px 0; transform:translate3d(0,-6px,0)}
+  }
+  .slide > :not(.geo-grid):not(.route-line):not(.slab):not(.magnet-lines):not(.bg-particles){
+    position:relative;
+    z-index:2;
+  }
+  .bg-particles{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:1;
+  }
+  .bg-particles span{
+    position:absolute;
+    left:var(--x);
+    top:var(--y);
+    width:var(--s);
+    height:var(--s);
+    border-radius:var(--r);
+    border:1px solid var(--c);
+    background:var(--fill);
+    opacity:var(--o);
+    transform:translate3d(0,0,0) rotate(var(--rot));
+    animation:rb-particle-drift var(--d) ease-in-out infinite alternate;
+    animation-delay:var(--delay);
+  }
+  .paper .bg-particles span{
+    --fill:rgba(255,255,255,.28);
+    box-shadow:0 0 18px rgba(31,111,104,.08);
+  }
+  .ink .bg-particles span{
+    --fill:rgba(255,255,255,.025);
+    box-shadow:0 0 24px rgba(255,107,107,.08);
+  }
+  @keyframes rb-particle-drift{
+    from{transform:translate3d(-8px, 8px, 0) rotate(var(--rot))}
+    to{transform:translate3d(18px, -16px, 0) rotate(calc(var(--rot) + 24deg))}
+  }
 
   /* Top bar + side nav */
   .topbar{
@@ -308,6 +384,9 @@
     flex-direction:column;
     gap:1.25rem;
   }
+  @media (min-width: 901px){
+    #s2 .gisauto-wrap{transform:translateY(16px)}
+  }
   .gisauto-head{
     display:flex;
     justify-content:space-between;
@@ -359,7 +438,7 @@
     display:block;
     width:100%;
     height:auto;
-    max-height:58vh;
+    max-height:50vh;
     object-fit:contain;
     object-position:center;
   }
@@ -701,6 +780,178 @@
   .marquee{display:flex; gap:2.25rem; white-space:nowrap; animation:mq 28s linear infinite; font-family:'Noto Serif SC',serif; font-weight:700}
   @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
+  /* React Bits inspired motion layer */
+  .rb-reveal{
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1), filter .7s ease;
+    transition-delay:var(--rb-delay, 0ms);
+  }
+  .slide.is-active .rb-reveal,
+  .rb-reveal.rb-visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .rb-blur-text{
+    filter:blur(10px);
+  }
+  .slide.is-active .rb-blur-text,
+  .rb-blur-text.rb-visible{
+    filter:blur(0);
+  }
+  .rb-split-text .rb-split-char{
+    display:inline-block;
+    opacity:0;
+    transform:translateY(.68em) rotateX(42deg);
+    transform-origin:50% 100%;
+  }
+  .slide.is-active .rb-split-text .rb-split-char,
+  .rb-split-text.rb-visible .rb-split-char{
+    animation:rb-split-in .74s cubic-bezier(.2,.78,.18,1) forwards;
+    animation-delay:calc(var(--i, 0) * 18ms + var(--rb-delay, 0ms));
+  }
+  @keyframes rb-split-in{
+    to{opacity:1; transform:translateY(0) rotateX(0)}
+  }
+  .rb-gradient-text{
+    background:linear-gradient(110deg, #9C0000 0%, #d99152 42%, #1f6f68 78%);
+    background-size:180% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent !important;
+    animation:rb-gradient-pan 7s ease-in-out infinite alternate;
+  }
+  @keyframes rb-gradient-pan{
+    from{background-position:0% 50%}
+    to{background-position:100% 50%}
+  }
+  .rb-shiny-text,
+  .rb-shiny-text .lang-zh,
+  .rb-shiny-text .lang-en{
+    --shine-base:rgba(26,26,26,.72);
+    --shine-gleam:#9C0000;
+    background:linear-gradient(110deg, var(--shine-base) 0%, var(--shine-base) 36%, var(--shine-gleam) 48%, var(--shine-base) 60%, var(--shine-base) 100%);
+    background-size:260% 100%;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent !important;
+    animation:rb-shine 3.2s linear infinite;
+  }
+  .ink .rb-shiny-text,
+  .hero-tag.rb-shiny-text{
+    --shine-base:rgba(255,255,255,.84);
+    --shine-gleam:#fff;
+  }
+  @keyframes rb-shine{
+    to{background-position:-260% 0}
+  }
+  .rb-shiny-button{
+    position:relative;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .rb-shiny-button::after{
+    content:"";
+    position:absolute;
+    inset:-2px;
+    background:linear-gradient(115deg, transparent 0%, transparent 38%, rgba(255,255,255,.52) 50%, transparent 62%, transparent 100%);
+    transform:translateX(-120%);
+    animation:rb-button-shine 3.6s ease-in-out infinite;
+    pointer-events:none;
+    z-index:0;
+  }
+  .rb-shiny-button > *{position:relative; z-index:1}
+  @keyframes rb-button-shine{
+    0%,46%{transform:translateX(-120%)}
+    72%,100%{transform:translateX(120%)}
+  }
+  .rb-spotlight{
+    position:relative;
+    overflow:hidden;
+  }
+  .rb-spotlight::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .25s ease;
+    background:radial-gradient(380px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(255,255,255,.34), rgba(217,145,82,.12) 34%, transparent 68%);
+    mix-blend-mode:screen;
+    z-index:0;
+  }
+  .rb-spotlight:hover::before{opacity:1}
+  .rb-spotlight > *{position:relative; z-index:1}
+  .rb-tilt{
+    transform-style:preserve-3d;
+    will-change:transform;
+    transition:transform .22s ease, box-shadow .22s ease;
+  }
+  .rb-tilt.rb-tilting{
+    transform:perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(-3px) rotate(var(--base-rotate, 0deg));
+  }
+  .portrait-card.rb-tilt{
+    --base-rotate:2deg;
+    transform:rotate(var(--base-rotate));
+  }
+  .rb-magnet{
+    display:inline-flex;
+    transform:translate(var(--magnet-x, 0), var(--magnet-y, 0));
+    transition:transform .24s cubic-bezier(.2,.8,.2,1);
+    will-change:transform;
+  }
+  .magnet-lines{
+    position:absolute;
+    right:8%;
+    top:22%;
+    width:210px;
+    height:132px;
+    pointer-events:none;
+    opacity:.34;
+    display:grid;
+    grid-template-columns:repeat(9, 1fr);
+    gap:9px;
+    transform:rotate(-10deg);
+    z-index:1;
+  }
+  .magnet-lines i{
+    display:block;
+    width:1px;
+    height:24px;
+    background:linear-gradient(180deg, rgba(31,111,104,0), rgba(31,111,104,.85), rgba(217,145,82,0));
+    transform:rotate(var(--line-rot, 0deg));
+    transform-origin:center;
+    animation:rb-magnet-lines 3.8s ease-in-out infinite;
+    animation-delay:calc(var(--i, 0) * -70ms);
+  }
+  @keyframes rb-magnet-lines{
+    0%,100%{transform:rotate(-18deg) scaleY(.72)}
+    50%{transform:rotate(18deg) scaleY(1.12)}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *,
+    *::before,
+    *::after{
+      animation-duration:.001ms !important;
+      animation-iteration-count:1 !important;
+      scroll-behavior:auto !important;
+      transition-duration:.001ms !important;
+    }
+    .rb-reveal,
+    .rb-blur-text,
+    .rb-split-text .rb-split-char{
+      opacity:1 !important;
+      filter:none !important;
+      transform:none !important;
+    }
+    .paper::after,
+    .ink::after,
+    .bg-particles span{
+      animation:none !important;
+    }
+  }
+
   /* Mobile */
   @media (max-width: 900px){
     body{overflow:auto}
@@ -712,6 +963,8 @@
     .slide-counter{display:none}
     .topbar{padding:.75rem 1rem}
     .slab,.circle-seal,.route-line,.geo-grid{display:none}
+    .paper::after,.ink::after{opacity:.42}
+    .bg-particles{opacity:.45}
     .hero-layout{grid-template-columns:1fr; gap:1.35rem}
     .hero-copy{max-width:none}
     .portrait-card{width:138px; justify-self:start; padding:.45rem; border-radius:18px; transform:none; margin-top:.25rem}
@@ -785,35 +1038,36 @@
   <div class="slab paper" style="right:13%; bottom:18%; width:170px; height:110px; background:transparent; border:1px solid rgba(156,0,0,.18); box-shadow:none"></div>
   <div class="slab red" style="right:5%; bottom:14%; width:44px; height:44px; border-radius:999px; opacity:.12"></div>
   <div class="slab paper" style="left:18%; top:24%; width:96px; height:96px; background:transparent; border:1px dashed rgba(156,0,0,.18); box-shadow:none"></div>
+  <div class="magnet-lines" aria-hidden="true"></div>
   <div class="hero-layout">
     <div class="hero-copy">
-      <div class="eyebrow">Portfolio · 2026 · HKUST(GZ)</div>
-      <h1 class="display" style="font-size:clamp(3rem, 6vw, 5.8rem); margin-top:1.25rem">
-        <span class="lang-zh"><span style="color:#9C0000">王钰淞</span><br/>GIS 与多模态 AI<br/>研究 / 工程。</span>
-        <span class="lang-en"><span style="color:#9C0000">Yusong Wang</span><br/>GIS &amp; Multimodal AI<br/>research / engineering.</span>
+      <div class="eyebrow rb-decrypt rb-reveal">Portfolio · 2026 · HKUST(GZ)</div>
+      <h1 class="display rb-split-text rb-reveal" style="font-size:clamp(3rem, 6vw, 5.8rem); margin-top:1.25rem">
+        <span class="lang-zh"><span class="rb-gradient-text" style="color:#9C0000">王钰淞</span><br/>GIS 与多模态 AI<br/>研究 / 工程。</span>
+        <span class="lang-en"><span class="rb-gradient-text" style="color:#9C0000">Yusong Wang</span><br/>GIS &amp; Multimodal AI<br/>research / engineering.</span>
       </h1>
-      <p style="margin-top:2rem; max-width:620px; color:rgba(26,26,26,.72); line-height:1.7">
+      <p class="rb-blur-text rb-reveal" style="margin-top:2rem; max-width:620px; color:rgba(26,26,26,.72); line-height:1.7; --rb-delay:220ms">
         <span class="lang-zh">香港科技大学（广州）计算媒体与艺术 MPhil，前中科院上海微系统所嵌入式工程师。关注 GIS 可视化、知识图谱、多模态检索与文化遗产计算。</span>
         <span class="lang-en">MPhil student in Computational Media &amp; Arts at HKUST(GZ), formerly an embedded engineer at CAS SIMIT. I work across GIS visualization, knowledge graphs, multimodal retrieval, and computational heritage.</span>
       </p>
 
-      <div style="margin-top:1.5rem; display:flex; gap:.55rem; flex-wrap:wrap">
+      <div class="rb-reveal" style="margin-top:1.5rem; display:flex; gap:.55rem; flex-wrap:wrap; --rb-delay:320ms">
         <span class="chip">HKUST(GZ) · MPhil</span>
         <span class="chip">VINCI 2025 · 1st author</span>
         <span class="chip">CHI 2025 · co-author</span>
         <span class="chip">4 patents + 1 SW&copy;</span>
       </div>
 
-      <div style="margin-top:2rem; display:flex; gap:.75rem; flex-wrap:wrap">
-        <a onclick="goTo(1)" style="cursor:pointer; background:#9C0000; color:#fff; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
+      <div class="rb-reveal" style="margin-top:2rem; display:flex; gap:.75rem; flex-wrap:wrap; --rb-delay:420ms">
+        <a class="rb-magnet rb-shiny-button" onclick="goTo(1)" style="cursor:pointer; background:#9C0000; color:#fff; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">看 GISauto →</span><span class="lang-en">See GISauto →</span>
         </a>
-        <a onclick="goTo(7)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
+        <a class="rb-magnet" onclick="goTo(7)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">联系我</span><span class="lang-en">Get in touch</span>
         </a>
       </div>
     </div>
-    <figure class="portrait-card" aria-label="Yusong Wang portrait">
+    <figure class="portrait-card rb-tilt rb-spotlight" aria-label="Yusong Wang portrait">
       <img src="assets/yusong_portrait.png" alt="Yusong Wang portrait" />
       <figcaption>
         <span>Yusong Wang</span>
@@ -830,8 +1084,8 @@
   <div class="gisauto-wrap">
     <div class="gisauto-head">
       <div>
-        <div class="eyebrow" style="color:#ff6b6b">GIS Project · 01</div>
-        <h2 class="display gisauto-title">GISauto</h2>
+        <div class="eyebrow rb-decrypt rb-reveal" style="color:#ff6b6b">GIS Project · 01</div>
+        <h2 class="display gisauto-title rb-decrypt rb-gradient-text">GISauto</h2>
         <p class="gisauto-sub">
           <span class="lang-zh">广西历史建筑多模态 GIS 平台</span>
           <span class="lang-en">A multimodal GIS platform for Guangxi heritage</span>
@@ -843,7 +1097,7 @@
       </p>
     </div>
 
-    <figure class="hero-shot-full">
+    <figure class="hero-shot-full rb-tilt rb-spotlight">
       <img src="assets/gisauto_hero.png" alt="GISauto live interface — Heritage Explorer dashboard" />
       <figcaption>
         <span class="hero-tag">LIVE INTERFACE</span>
@@ -1349,6 +1603,7 @@
   const navLinks = document.querySelectorAll('.nav-link');
   const slides = document.querySelectorAll('.slide');
   const total = slides.length;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const railLabels = [
     ['首页', 'Home'],
     ['GISauto', 'GISauto'],
@@ -1369,6 +1624,175 @@
     { start: 6, end: 6 },
     { start: 7, end: 7 }
   ];
+
+  function setupReactBitsMotion() {
+    const magnetLines = document.querySelector('.magnet-lines');
+    if (magnetLines && !magnetLines.children.length) {
+      for (let i = 0; i < 54; i++) {
+        const line = document.createElement('i');
+        line.style.setProperty('--i', i);
+        magnetLines.appendChild(line);
+      }
+    }
+
+    slides.forEach((slide, slideIndex) => {
+      if (slide.querySelector('.bg-particles')) return;
+      const field = document.createElement('div');
+      field.className = 'bg-particles';
+      field.setAttribute('aria-hidden', 'true');
+      const count = window.matchMedia('(max-width: 900px)').matches ? 16 : 28;
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement('span');
+        const seed = (slideIndex + 1) * 97 + i * 37;
+        const x = (seed * 13) % 100;
+        const y = (seed * 29) % 100;
+        const size = 4 + (seed % 13);
+        const teal = `rgba(31,111,104,${0.16 + (seed % 5) * 0.035})`;
+        const red = `rgba(156,0,0,${0.12 + (seed % 4) * 0.025})`;
+        const amber = `rgba(217,145,82,${0.12 + (seed % 6) * 0.025})`;
+        dot.style.setProperty('--x', `${x}%`);
+        dot.style.setProperty('--y', `${y}%`);
+        dot.style.setProperty('--s', `${size}px`);
+        dot.style.setProperty('--r', seed % 3 === 0 ? '2px' : '999px');
+        dot.style.setProperty('--c', seed % 3 === 0 ? red : seed % 3 === 1 ? teal : amber);
+        dot.style.setProperty('--o', `${0.28 + (seed % 5) * 0.06}`);
+        dot.style.setProperty('--rot', `${seed % 180}deg`);
+        dot.style.setProperty('--d', `${7 + (seed % 9)}s`);
+        dot.style.setProperty('--delay', `${-(seed % 8)}s`);
+        field.appendChild(dot);
+      }
+      slide.prepend(field);
+    });
+
+    document.querySelectorAll('.slide h2.display:not(.gisauto-title), .slide h3.display').forEach((el, i) => {
+      el.classList.add('rb-reveal', 'rb-blur-text');
+      el.style.setProperty('--rb-delay', `${Math.min(i % 4, 3) * 80}ms`);
+    });
+
+    document.querySelectorAll('.card, .pillar-card, .combo-pane, .combo-chat').forEach((el, i) => {
+      el.classList.add('rb-reveal', 'rb-spotlight');
+      el.style.setProperty('--rb-delay', `${Math.min(i % 6, 5) * 70}ms`);
+    });
+
+    document.querySelectorAll('.card, .combo-pane').forEach((el) => el.classList.add('rb-tilt'));
+    document.querySelectorAll('.hero-copy .chip, .hero-tag, .combo-num').forEach((el) => el.classList.add('rb-shiny-text'));
+    document.querySelectorAll('.rb-split-text').forEach(splitTextElement);
+    setupSpotlight();
+    setupTilt();
+    setupMagnet();
+    setupRevealObserver();
+  }
+
+  function splitTextElement(el) {
+    if (el.dataset.rbSplitReady) return;
+    let index = 0;
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const frag = document.createDocumentFragment();
+          Array.from(child.textContent).forEach((char) => {
+            if (char === ' ') {
+              frag.appendChild(document.createTextNode(' '));
+              return;
+            }
+            const span = document.createElement('span');
+            span.className = 'rb-split-char';
+            span.style.setProperty('--i', index++);
+            span.textContent = char;
+            frag.appendChild(span);
+          });
+          child.replaceWith(frag);
+        } else if (child.nodeType === Node.ELEMENT_NODE && !child.matches('script, style')) {
+          walk(child);
+        }
+      });
+    };
+    walk(el);
+    el.dataset.rbSplitReady = 'true';
+  }
+
+  function setupSpotlight() {
+    document.querySelectorAll('.rb-spotlight').forEach((el) => {
+      el.addEventListener('pointermove', (event) => {
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
+        el.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
+      });
+    });
+  }
+
+  function setupTilt() {
+    if (reduceMotion) return;
+    document.querySelectorAll('.rb-tilt').forEach((el) => {
+      el.addEventListener('pointermove', (event) => {
+        const rect = el.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - .5;
+        const y = (event.clientY - rect.top) / rect.height - .5;
+        el.style.setProperty('--tilt-x', `${(-y * 7).toFixed(2)}deg`);
+        el.style.setProperty('--tilt-y', `${(x * 8).toFixed(2)}deg`);
+        el.classList.add('rb-tilting');
+      });
+      el.addEventListener('pointerleave', () => {
+        el.classList.remove('rb-tilting');
+        el.style.setProperty('--tilt-x', '0deg');
+        el.style.setProperty('--tilt-y', '0deg');
+      });
+    });
+  }
+
+  function setupMagnet() {
+    if (reduceMotion) return;
+    document.querySelectorAll('.rb-magnet').forEach((el) => {
+      el.addEventListener('pointermove', (event) => {
+        const rect = el.getBoundingClientRect();
+        const x = (event.clientX - rect.left - rect.width / 2) * .18;
+        const y = (event.clientY - rect.top - rect.height / 2) * .18;
+        el.style.setProperty('--magnet-x', `${x.toFixed(1)}px`);
+        el.style.setProperty('--magnet-y', `${y.toFixed(1)}px`);
+      });
+      el.addEventListener('pointerleave', () => {
+        el.style.setProperty('--magnet-x', '0px');
+        el.style.setProperty('--magnet-y', '0px');
+      });
+    });
+  }
+
+  const decryptTimers = new WeakMap();
+  function runDecrypt(el) {
+    if (reduceMotion || el.dataset.decrypting === 'true') return;
+    const original = el.dataset.rbText || el.textContent.trim();
+    el.dataset.rbText = original;
+    const chars = 'GISAI0123456789HKUSTGZ';
+    let frame = 0;
+    clearInterval(decryptTimers.get(el));
+    el.dataset.decrypting = 'true';
+    const timer = setInterval(() => {
+      const progress = frame / 18;
+      el.textContent = Array.from(original).map((char, idx) => {
+        if (char === ' ' || char === '·' || char === '(' || char === ')' || char === '-') return char;
+        return idx / original.length < progress ? char : chars[Math.floor(Math.random() * chars.length)];
+      }).join('');
+      frame++;
+      if (frame > 20) {
+        clearInterval(timer);
+        el.textContent = original;
+        el.dataset.decrypting = 'false';
+      }
+    }, 34);
+    decryptTimers.set(el, timer);
+  }
+
+  function setupRevealObserver() {
+    if (!('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add('rb-visible');
+      });
+    }, { root: window.matchMedia('(max-width: 900px)').matches ? null : deck, threshold: .34 });
+    document.querySelectorAll('.rb-reveal, .rb-blur-text, .rb-split-text').forEach((el) => observer.observe(el));
+  }
+
+  setupReactBitsMotion();
 
   // Build rail dots
   for (let i = 0; i < total; i++) {
@@ -1403,6 +1827,10 @@
   let current = 0;
   function setActive(i) {
     current = i;
+    slides.forEach((slide, idx) => {
+      slide.classList.toggle('is-active', idx === i);
+      if (idx === i) slide.querySelectorAll('.rb-decrypt').forEach(runDecrypt);
+    });
     rail.querySelectorAll('button').forEach((b, idx) => {
       b.classList.toggle('active', idx === i);
     });
