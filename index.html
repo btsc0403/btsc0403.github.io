@@ -70,6 +70,7 @@
     overflow:hidden;
     isolation:isolate;
   }
+  .archived-slide{display:none !important}
 
   /* Paper + grain */
   .paper{
@@ -229,16 +230,73 @@
     position:fixed; left:1.1rem; top:50%; transform:translateY(-50%);
     z-index:40;
     display:flex; flex-direction:column; gap:.45rem;
+    --gooey-y:0px;
+    --gooey-hover-y:0px;
+    --gooey-h:36px;
+    --gooey-dark:#680000;
+    --gooey-mid:#8b0707;
+    isolation:isolate;
+  }
+  .rail-goo-layer{
+    position:absolute;
+    inset:-10px -12px;
+    pointer-events:none;
+    z-index:0;
+    filter:url(#gooey-nav-filter);
+  }
+  .rail-goo-main,
+  .rail-goo-hover,
+  .rail-goo-dot{
+    position:absolute;
+    border-radius:999px;
+    background:var(--gooey-dark);
+    transform:translate3d(0, var(--gooey-y), 0);
+    transition:transform .46s cubic-bezier(.2,.86,.18,1), width .36s ease, opacity .24s ease;
+  }
+  .rail-goo-main{
+    left:10px;
+    top:10px;
+    width:164px;
+    height:var(--gooey-h);
+    box-shadow:0 18px 32px -22px rgba(104,0,0,.9);
+  }
+  .rail-goo-hover{
+    left:10px;
+    top:10px;
+    width:164px;
+    height:var(--gooey-h);
+    opacity:0;
+    background:var(--gooey-mid);
+    transform:translate3d(0, var(--gooey-hover-y), 0) scale(.96);
+  }
+  .rail:hover .rail-goo-hover{
+    opacity:.72;
+  }
+  .rail-goo-dot{
+    width:14px;
+    height:14px;
+    left:158px;
+    top:21px;
+    opacity:.72;
+    background:#a31414;
+    animation:rail-goo-orbit 3.2s ease-in-out infinite;
+  }
+  @keyframes rail-goo-orbit{
+    0%,100%{transform:translate3d(-4px, calc(var(--gooey-y) - 1px), 0) scale(.75)}
+    50%{transform:translate3d(8px, calc(var(--gooey-y) + 3px), 0) scale(1)}
   }
   .rail button{
     width:164px; min-height:36px; border-radius:999px;
-    background:rgba(255,255,255,.62);
-    border:1px solid rgba(26,26,26,.08);
+    position:relative;
+    z-index:1;
+    background:rgba(255,255,255,.68);
+    border:1px solid rgba(156,0,0,.08);
     cursor:pointer; transition:all .25s;
     display:flex; align-items:center; gap:.45rem;
     padding:.38rem .72rem;
     color:rgba(26,26,26,.56);
-    box-shadow:0 10px 30px -24px rgba(26,26,26,.7);
+    box-shadow:0 10px 30px -26px rgba(26,26,26,.65), inset 0 1px 0 rgba(255,255,255,.64);
+    backdrop-filter:blur(8px);
   }
   .rail button::before{
     content:attr(data-num);
@@ -246,17 +304,34 @@
     display:grid; place-items:center;
     font-family:'JetBrains Mono',monospace;
     font-size:.68rem; font-weight:800;
-    background:rgba(156,0,0,.08);
-    color:#9C0000;
+    background:rgba(104,0,0,.09);
+    color:#760000;
     flex-shrink:0;
+    transition:background .24s ease, color .24s ease, transform .24s ease;
   }
   .rail button span{
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     font-size:.8rem; font-weight:800;
   }
-  .rail button:hover{background:rgba(31,111,104,.1); color:#1f6f68}
-  .rail button.active{background:#9C0000; color:#fff; border-color:#9C0000; transform:translateX(4px)}
-  .rail button.active::before{background:rgba(255,255,255,.18); color:#fff}
+  .rail button:hover{
+    color:#fff;
+    background:rgba(104,0,0,.12);
+    border-color:rgba(104,0,0,.22);
+    transform:translateX(3px);
+  }
+  .rail button.active{
+    background:transparent;
+    color:#fff;
+    border-color:transparent;
+    transform:translateX(6px);
+    box-shadow:none;
+  }
+  .rail button.active::before,
+  .rail button:hover::before{
+    background:rgba(255,255,255,.18);
+    color:#fff;
+    transform:scale(.96);
+  }
 
   /* Progress */
   .progress{
@@ -413,7 +488,7 @@
   }
   .hero-shot-full{
     position:relative;
-    width:min(100%, calc(50vh * 2.0118));
+    width:min(100%, calc(46vh * 2.0118));
     margin:0 auto;
     border-radius:22px;
     overflow:hidden;
@@ -438,7 +513,7 @@
     display:block;
     width:100%;
     height:auto;
-    max-height:50vh;
+    max-height:46vh;
     object-fit:contain;
     object-position:center;
   }
@@ -476,14 +551,54 @@
     gap:1.5rem;
     align-items:stretch;
   }
+  .gisauto-integrated{
+    grid-template-columns:.76fr 1fr 1fr;
+    gap:.9rem;
+  }
+  .gisauto-integrated .stat-strip{
+    grid-template-columns:repeat(2,1fr);
+  }
+  .gisauto-mini-card{
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;
+    background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+    padding:1rem 1.1rem;
+    min-height:142px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .gisauto-mini-card small{
+    color:#ffb36f;
+    font-weight:800;
+    font-size:.62rem;
+    letter-spacing:.16em;
+  }
+  .gisauto-mini-card h3{
+    margin:.4rem 0 .35rem;
+    font-family:'Noto Serif SC',serif;
+    font-size:1.05rem;
+    color:rgba(255,255,255,.92);
+  }
+  .gisauto-mini-card p{
+    margin:0;
+    color:rgba(255,255,255,.66);
+    font-size:.72rem;
+    line-height:1.55;
+  }
+  .gisauto-mini-card .chip{
+    font-size:.6rem;
+    padding:.13rem .44rem;
+  }
   .stat-strip{
     display:grid;
     grid-template-columns:repeat(4,1fr);
     gap:.75rem;
   }
   .stat-strip > div{
+    border:1px solid rgba(255,255,255,.09);
     border-left:2px solid #9C0000;
-    padding:.5rem .8rem;
+    border-radius:16px;
+    padding:.72rem .85rem;
+    background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
   }
   .stat-strip b{
     font-family:'Noto Serif SC',serif;
@@ -680,11 +795,55 @@
     max-width:1180px;
     z-index:2;
     display:grid;
-    grid-template-columns:minmax(0, 1fr) 320px;
-    gap:3.2rem;
+    grid-template-columns:minmax(0, 1fr) 390px;
+    gap:3rem;
     align-items:center;
   }
   .hero-copy{max-width:780px}
+  .hero-side{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    min-width:0;
+  }
+  .profile-panel{
+    border:1px solid rgba(31,111,104,.15);
+    border-radius:24px;
+    background:linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.5));
+    padding:.9rem;
+    box-shadow:0 34px 90px -52px rgba(26,26,26,.55), inset 0 1px 0 rgba(255,255,255,.7);
+    backdrop-filter:blur(10px);
+  }
+  .profile-top{
+    display:grid;
+    grid-template-columns:126px 1fr;
+    gap:1rem;
+    align-items:end;
+    padding:.15rem .15rem .85rem;
+    border-bottom:1px solid rgba(26,26,26,.08);
+  }
+  .profile-photo{
+    width:126px;
+    height:154px;
+    border-radius:18px;
+    object-fit:cover;
+    object-position:center 34%;
+    background:#fff;
+    box-shadow:0 18px 42px -30px rgba(26,26,26,.55);
+    filter:saturate(.96) contrast(1.02);
+  }
+  .profile-name{
+    font-family:'Noto Serif SC',serif;
+    font-size:1.15rem;
+    font-weight:700;
+    color:#1a1a1a;
+    margin:0 0 .35rem;
+  }
+  .profile-meta{
+    font-size:.72rem;
+    line-height:1.5;
+    color:rgba(26,26,26,.62);
+  }
   .portrait-card{
     margin:0;
     position:relative;
@@ -722,6 +881,137 @@
     letter-spacing:.12em;
     text-transform:uppercase;
     color:rgba(26,26,26,.58);
+  }
+  .home-experience{
+    padding:.9rem .15rem .05rem;
+  }
+  .home-exp-list{
+    display:grid;
+    gap:.62rem;
+    margin-top:.7rem;
+  }
+  .home-exp-item{
+    display:grid;
+    grid-template-columns:58px 1fr;
+    gap:.8rem;
+    align-items:start;
+    position:relative;
+  }
+  .home-exp-item:not(:last-child)::after{
+    content:"";
+    position:absolute;
+    left:28px;
+    top:1.25rem;
+    bottom:-.58rem;
+    width:1px;
+    background:linear-gradient(180deg, rgba(156,0,0,.28), rgba(31,111,104,.16));
+  }
+  .home-exp-year{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.62rem;
+    color:#9C0000;
+    letter-spacing:.08em;
+    padding-top:.18rem;
+    position:relative;
+    z-index:1;
+  }
+  .home-exp-year::before{
+    content:"";
+    display:inline-block;
+    width:8px;
+    height:8px;
+    border-radius:999px;
+    background:#9C0000;
+    box-shadow:0 0 0 4px rgba(156,0,0,.1);
+    margin-right:.38rem;
+  }
+  .home-exp-item b{
+    display:block;
+    font-size:.82rem;
+    color:rgba(26,26,26,.84);
+  }
+  .home-exp-desc{
+    display:block;
+    margin-top:.16rem;
+    font-size:.7rem;
+    color:rgba(26,26,26,.58);
+    line-height:1.42;
+  }
+
+  .work-wrap{
+    width:100%;
+    max-width:1340px;
+  }
+  .work-grid{
+    margin-top:1.55rem;
+    display:grid;
+    grid-template-columns:1.08fr .92fr;
+    gap:1.05rem;
+    align-items:start;
+  }
+  .paper-stack,
+  .project-stack{
+    display:grid;
+    gap:.9rem;
+  }
+  .work-card{
+    border:1px solid rgba(156,0,0,.11);
+    background:linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.58));
+    border-radius:18px;
+    padding:1rem 1.12rem;
+    box-shadow:0 18px 46px -38px rgba(26,26,26,.46), inset 0 1px 0 rgba(255,255,255,.65);
+    backdrop-filter:blur(8px);
+  }
+  .work-card.featured{
+    background:linear-gradient(135deg, #9C0000 0%, #7a0000 100%);
+    border-color:transparent;
+    color:#fff;
+  }
+  .work-card h3{
+    font-family:'Noto Serif SC',serif;
+    margin:.35rem 0 .35rem;
+    font-size:1.28rem;
+  }
+  .work-card p{
+    margin:0;
+    font-size:.76rem;
+    line-height:1.55;
+    color:rgba(26,26,26,.68);
+  }
+  .work-card.featured p{color:rgba(255,255,255,.84)}
+  .project-mini{
+    display:grid;
+    grid-template-columns:38px 1fr auto;
+    gap:.7rem;
+    align-items:start;
+    border:1px solid rgba(156,0,0,.1);
+    background:linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.55));
+    border-radius:18px;
+    padding:.72rem .85rem;
+    box-shadow:0 14px 36px -34px rgba(26,26,26,.42), inset 0 1px 0 rgba(255,255,255,.58);
+  }
+  .project-mini .num{
+    font-family:'JetBrains Mono',monospace;
+    color:#9C0000;
+    font-weight:800;
+    font-size:.68rem;
+    letter-spacing:.12em;
+  }
+  .project-mini b{
+    display:block;
+    font-family:'Noto Serif SC',serif;
+    font-size:.92rem;
+  }
+  .project-mini p{
+    margin:.18rem 0 0;
+    color:rgba(26,26,26,.62);
+    font-size:.68rem;
+    line-height:1.42;
+  }
+  .project-mini time{
+    color:rgba(26,26,26,.45);
+    font-size:.66rem;
+    white-space:nowrap;
   }
 
   /* Hero decor */
@@ -929,6 +1219,208 @@
     50%{transform:rotate(18deg) scaleY(1.12)}
   }
 
+  /* Terminal-to-MacBook intro */
+  .boot-intro{
+    position:fixed;
+    inset:0;
+    z-index:120;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(900px 620px at 28% 18%, rgba(104,0,0,.26), transparent 58%),
+      radial-gradient(840px 540px at 82% 12%, rgba(31,111,104,.24), transparent 62%),
+      linear-gradient(135deg, #090707 0%, #150909 46%, #070c0b 100%);
+    color:#f7efe6;
+    overflow:hidden;
+    opacity:1;
+    transition:opacity .55s ease, visibility .55s ease;
+  }
+  html.boot-intro-enabled .boot-intro{display:flex}
+  html.boot-intro-disabled .boot-intro{display:none}
+  .boot-intro.is-done{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .boot-intro::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size:38px 38px;
+    mask-image:radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  }
+  .boot-skip{
+    position:absolute;
+    right:1.25rem;
+    top:1.1rem;
+    z-index:3;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:999px;
+    background:rgba(255,255,255,.08);
+    color:rgba(255,255,255,.78);
+    font-size:.7rem;
+    letter-spacing:.12em;
+    padding:.45rem .8rem;
+    cursor:pointer;
+    backdrop-filter:blur(10px);
+  }
+  .boot-stage{
+    position:relative;
+    z-index:2;
+    width:min(860px, 86vw);
+    height:min(560px, 72vh);
+    display:grid;
+    place-items:center;
+    perspective:1200px;
+  }
+  .boot-device{
+    position:relative;
+    width:min(760px, 82vw);
+    transform-style:preserve-3d;
+    animation:boot-device-flight 2.78s cubic-bezier(.2,.82,.16,1) forwards;
+  }
+  .boot-screen{
+    position:relative;
+    height:430px;
+    border-radius:22px;
+    padding:14px;
+    background:linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.04));
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 42px 120px -46px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.16);
+    overflow:hidden;
+  }
+  .boot-screen::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(115deg, transparent 0 42%, rgba(255,255,255,.12) 50%, transparent 62% 100%);
+    opacity:.65;
+  }
+  .boot-terminal{
+    height:100%;
+    border-radius:14px;
+    overflow:hidden;
+    background:rgba(5,7,7,.92);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 0 0 1px rgba(104,0,0,.18);
+  }
+  .boot-bar{
+    height:34px;
+    display:flex;
+    align-items:center;
+    gap:.46rem;
+    padding:0 .85rem;
+    background:linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.04));
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .boot-dot{
+    width:10px;
+    height:10px;
+    border-radius:999px;
+    background:#ff5f57;
+  }
+  .boot-dot:nth-child(2){background:#ffbd2e}
+  .boot-dot:nth-child(3){background:#28c840}
+  .boot-title{
+    margin-left:.45rem;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.7rem;
+    color:rgba(255,255,255,.54);
+  }
+  .boot-code{
+    margin:0;
+    padding:1.35rem 1.45rem;
+    font-family:'JetBrains Mono', ui-monospace, Menlo, monospace;
+    font-size:clamp(.78rem, 1.5vw, 1.02rem);
+    line-height:1.8;
+    color:#f9f0e6;
+  }
+  .boot-line{
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    width:0;
+    animation:boot-type .42s steps(42,end) forwards;
+    animation-delay:var(--delay);
+  }
+  .boot-prompt{color:#ff7979}
+  .boot-ok{color:#79e2d1}
+  .boot-muted{color:rgba(249,240,230,.62)}
+  .boot-cursor{
+    display:inline-block;
+    width:.62em;
+    height:1.05em;
+    margin-left:.18em;
+    background:#9C0000;
+    transform:translateY(.18em);
+    animation:boot-cursor .72s steps(1,end) infinite;
+  }
+  @keyframes boot-type{
+    to{width:100%}
+  }
+  @keyframes boot-cursor{
+    0%,52%{opacity:1}
+    53%,100%{opacity:0}
+  }
+  .boot-base{
+    position:relative;
+    width:86%;
+    height:34px;
+    margin:0 auto;
+    border-radius:0 0 24px 24px;
+    background:linear-gradient(180deg, #d8d2c8, #7d756c);
+    box-shadow:0 34px 80px -34px rgba(0,0,0,.92);
+    opacity:0;
+    transform:translateY(-4px) rotateX(66deg);
+    transform-origin:top;
+    animation:boot-base-in 2.78s cubic-bezier(.2,.82,.16,1) forwards;
+  }
+  .boot-base::before{
+    content:"";
+    position:absolute;
+    left:42%;
+    top:0;
+    width:16%;
+    height:6px;
+    border-radius:0 0 10px 10px;
+    background:rgba(40,35,32,.38);
+  }
+  .boot-status{
+    position:absolute;
+    left:50%;
+    bottom:7vh;
+    transform:translateX(-50%);
+    z-index:2;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.72rem;
+    letter-spacing:.18em;
+    color:rgba(255,255,255,.54);
+    text-transform:uppercase;
+    animation:boot-status-out 2.78s ease forwards;
+  }
+  @keyframes boot-device-flight{
+    0%{opacity:0; transform:translate3d(0, 24px, 0) scale(1.12) rotateX(0deg)}
+    10%{opacity:1}
+    46%{transform:translate3d(0, 0, 0) scale(1.12) rotateX(0deg)}
+    70%{transform:translate3d(0, -12px, -80px) scale(.82) rotateX(12deg)}
+    88%{opacity:1; transform:translate3d(0, -20px, -120px) scale(.72) rotateX(10deg)}
+    100%{opacity:0; transform:translate3d(0, -46px, -180px) scale(.58) rotateX(8deg)}
+  }
+  @keyframes boot-base-in{
+    0%,48%{opacity:0}
+    66%,92%{opacity:1}
+    100%{opacity:0}
+  }
+  @keyframes boot-status-out{
+    0%,72%{opacity:.68}
+    100%{opacity:0}
+  }
+
   @media (prefers-reduced-motion: reduce){
     *,
     *::before,
@@ -947,7 +1439,11 @@
     }
     .paper::after,
     .ink::after,
-    .bg-particles span{
+    .bg-particles span,
+    .boot-device,
+    .boot-base,
+    .boot-status,
+    .boot-line{
       animation:none !important;
     }
   }
@@ -967,12 +1463,23 @@
     .bg-particles{opacity:.45}
     .hero-layout{grid-template-columns:1fr; gap:1.35rem}
     .hero-copy{max-width:none}
+    .hero-side{max-width:none}
+    .profile-panel{padding:.75rem; border-radius:20px}
+    .profile-top{grid-template-columns:88px 1fr; gap:.8rem}
+    .profile-photo{width:88px; height:110px; border-radius:14px}
+    .profile-name{font-size:1rem}
+    .home-exp-item{grid-template-columns:50px 1fr}
     .portrait-card{width:138px; justify-self:start; padding:.45rem; border-radius:18px; transform:none; margin-top:.25rem}
     .portrait-card::before{display:none}
     .portrait-card img{height:168px; border-radius:14px}
     .portrait-card figcaption{display:none}
     .visual-stack,.mini-flow-nav,.project-grid,.project-pillars{grid-template-columns:1fr}
     .gisauto-footer{grid-template-columns:1fr}
+    .gisauto-integrated{grid-template-columns:1fr}
+    .work-grid{grid-template-columns:1fr}
+    .project-mini{grid-template-columns:32px 1fr}
+    .project-mini time{display:none}
+    .home-exp-item{grid-template-columns:52px 1fr}
     .stat-strip{grid-template-columns:repeat(2,1fr)}
     .pillar-strip{grid-template-columns:1fr}
     .hero-shot-full img{max-height:none}
@@ -981,10 +1488,67 @@
     .hint{display:none}
     .flow-wrap{grid-template-columns:1fr}
     .flow-img img{max-height:60vh}
+    .boot-stage{width:94vw; height:68vh}
+    .boot-device{width:92vw}
+    .boot-screen{height:330px; border-radius:18px; padding:10px}
+    .boot-code{padding:1rem; font-size:.68rem; line-height:1.75}
+    .boot-status{bottom:12vh; width:88vw; text-align:center}
   }
 </style>
 </head>
 <body data-lang="zh" class="antialiased">
+
+<script>
+  (() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const forceIntro = params.get('intro') === '1';
+      const seenIntro = sessionStorage.getItem('portfolioBootIntro') === 'done';
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.documentElement.classList.add(!reduceMotion && (!seenIntro || forceIntro) ? 'boot-intro-enabled' : 'boot-intro-disabled');
+    } catch (error) {
+      document.documentElement.classList.add('boot-intro-enabled');
+    }
+  })();
+</script>
+
+<div class="boot-intro" id="bootIntro" role="status" aria-live="polite" aria-label="Portfolio boot intro">
+  <button class="boot-skip" id="bootSkip" type="button">SKIP</button>
+  <div class="boot-stage" aria-hidden="true">
+    <div class="boot-device">
+      <div class="boot-screen">
+        <div class="boot-terminal">
+          <div class="boot-bar">
+            <span class="boot-dot"></span>
+            <span class="boot-dot"></span>
+            <span class="boot-dot"></span>
+            <span class="boot-title">yusong@portfolio: ~/gis-ai</span>
+          </div>
+          <pre class="boot-code"><span class="boot-line" style="--delay:.12s"><span class="boot-prompt">$</span> whoami</span>
+<span class="boot-line boot-ok" style="--delay:.48s">yusong_wang · GIS × multimodal_ai</span>
+<span class="boot-line" style="--delay:.86s"><span class="boot-prompt">$</span> ./boot-portfolio --mode=research-engineering</span>
+<span class="boot-line boot-muted" style="--delay:1.22s">loading GISauto / Neo4j / RAG lanes...</span>
+<span class="boot-line boot-muted" style="--delay:1.58s">mounting papers, patents, embedded systems...</span>
+<span class="boot-line boot-ok" style="--delay:1.94s">open https://btsc0403.github.io <span class="boot-cursor"></span></span></pre>
+        </div>
+      </div>
+      <div class="boot-base"></div>
+    </div>
+  </div>
+  <div class="boot-status">Initializing Portfolio Interface</div>
+</div>
+
+<svg width="0" height="0" style="position:absolute; pointer-events:none" aria-hidden="true" focusable="false">
+  <filter id="gooey-nav-filter">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+    <feColorMatrix in="blur" mode="matrix" values="
+      1 0 0 0 0
+      0 1 0 0 0
+      0 0 1 0 0
+      0 0 0 20 -10" result="goo" />
+    <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+  </filter>
+</svg>
 
 <div class="progress" id="progress"></div>
 
@@ -998,15 +1562,12 @@
   <nav class="nav" aria-label="Portfolio sections">
     <button class="nav-link" data-target="0"><span class="lang-zh">首页</span><span class="lang-en">Home</span></button>
     <button class="nav-link" data-target="1">GISauto</button>
-    <button class="nav-link" data-target="2"><span class="lang-zh">架构 · Agent</span><span class="lang-en">Arch · Agent</span></button>
-    <button class="nav-link" data-target="3"><span class="lang-zh">论文</span><span class="lang-en">Papers</span></button>
-    <button class="nav-link" data-target="4"><span class="lang-zh">经历</span><span class="lang-en">Timeline</span></button>
-    <button class="nav-link" data-target="5"><span class="lang-zh">项目</span><span class="lang-en">Projects</span></button>
-    <button class="nav-link" data-target="6"><span class="lang-zh">技能</span><span class="lang-en">Skills</span></button>
-    <button class="nav-link" data-target="7"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></button>
+    <button class="nav-link" data-target="2"><span class="lang-zh">成果 · 项目</span><span class="lang-en">Work</span></button>
+    <button class="nav-link" data-target="3"><span class="lang-zh">技能</span><span class="lang-en">Skills</span></button>
+    <button class="nav-link" data-target="4"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></button>
   </nav>
   <div style="display:flex; align-items:center; gap:.75rem">
-    <span class="slide-counter" id="slideCounter">01/08</span>
+    <span class="slide-counter" id="slideCounter">01/05</span>
     <button id="langBtn" class="chip" style="cursor:pointer; font-weight:600">
       <span class="lang-zh">EN</span><span class="lang-en">中文</span>
     </button>
@@ -1062,18 +1623,48 @@
         <a class="rb-magnet rb-shiny-button" onclick="goTo(1)" style="cursor:pointer; background:#9C0000; color:#fff; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">看 GISauto →</span><span class="lang-en">See GISauto →</span>
         </a>
-        <a class="rb-magnet" onclick="goTo(7)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
+        <a class="rb-magnet" onclick="goTo(4)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">联系我</span><span class="lang-en">Get in touch</span>
         </a>
       </div>
     </div>
-    <figure class="portrait-card rb-tilt rb-spotlight" aria-label="Yusong Wang portrait">
-      <img src="assets/yusong_portrait.png" alt="Yusong Wang portrait" />
-      <figcaption>
-        <span>Yusong Wang</span>
-        <span>GIS · AI</span>
-      </figcaption>
-    </figure>
+    <div class="hero-side profile-panel rb-reveal rb-spotlight" style="--rb-delay:520ms">
+      <div class="profile-top">
+        <img class="profile-photo" src="assets/yusong_portrait.png" alt="Yusong Wang portrait" />
+        <div>
+          <p class="profile-name"><span class="lang-zh">王钰淞</span><span class="lang-en">Yusong Wang</span></p>
+          <p class="profile-meta">
+            <span class="lang-zh">GIS × 多模态 AI<br/>研究、工程、文化遗产计算</span>
+            <span class="lang-en">GIS × Multimodal AI<br/>research, engineering, heritage computing</span>
+          </p>
+          <div style="margin-top:.65rem; display:flex; flex-wrap:wrap; gap:.35rem">
+            <span class="chip" style="font-size:.62rem">HKUST(GZ)</span>
+            <span class="chip" style="font-size:.62rem">MPhil</span>
+          </div>
+        </div>
+      </div>
+      <div class="home-experience">
+        <div class="eyebrow" style="font-size:.62rem"><span class="lang-zh">经历</span><span class="lang-en">Experience</span></div>
+        <div class="home-exp-list">
+          <div class="home-exp-item">
+            <span class="home-exp-year">2016</span>
+            <div><b><span class="lang-zh">广西大学 · 电气工程本科</span><span class="lang-en">Guangxi Univ. · B.Eng</span></b><span class="home-exp-desc"><span class="lang-zh">电气工程及其自动化；参与智慧农业、光伏运维等互联网+项目。</span><span class="lang-en">Electrical engineering; Internet+ projects in smart agriculture and PV O&amp;M.</span></span></div>
+          </div>
+          <div class="home-exp-item">
+            <span class="home-exp-year">2020</span>
+            <div><b><span class="lang-zh">中科院上海微系统所 · 嵌入式工程师</span><span class="lang-en">CAS SIMIT · Embedded engineer</span></b><span class="home-exp-desc"><span class="lang-zh">无线水压表、LoRa 测力、消防感知；从原理图到固件和现场部署。</span><span class="lang-en">Wireless meters, LoRa sensors, fire-safety devices from schematic to field deployment.</span></span></div>
+          </div>
+          <div class="home-exp-item">
+            <span class="home-exp-year">2024</span>
+            <div><b><span class="lang-zh">HKUST(GZ) · 计算媒体与艺术 MPhil</span><span class="lang-en">HKUST(GZ) · CMA MPhil</span></b><span class="home-exp-desc"><span class="lang-zh">HeritageExplorer 投稿 VINCI 2025；合作 GenColor CHI 2025。</span><span class="lang-en">HeritageExplorer for VINCI 2025; co-authored GenColor at CHI 2025.</span></span></div>
+          </div>
+          <div class="home-exp-item">
+            <span class="home-exp-year">2025</span>
+            <div><b><span class="lang-zh">GISauto · 从原型到工程化</span><span class="lang-en">GISauto · Prototype to product</span></b><span class="home-exp-desc"><span class="lang-zh">扩展至广西历史建筑数据；搭建 Vue 3、FastAPI、Neo4j、多通路 RAG。</span><span class="lang-en">Scaled to Guangxi heritage data with Vue 3, FastAPI, Neo4j, and multi-lane RAG.</span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1105,37 +1696,33 @@
       </figcaption>
     </figure>
 
-    <div class="gisauto-footer">
+    <div class="gisauto-footer gisauto-integrated">
       <div class="stat-strip">
         <div><b>2,036</b><span><span class="lang-zh">历史建筑</span><span class="lang-en">BUILDINGS</span></span></div>
         <div><b>9,636</b><span><span class="lang-zh">建筑构件</span><span class="lang-en">COMPONENTS</span></span></div>
         <div><b>1,294</b><span><span class="lang-zh">地图点</span><span class="lang-en">MAP POINTS</span></span></div>
         <div><b>4</b><span><span class="lang-zh">检索通路</span><span class="lang-en">RETRIEVAL LANES</span></span></div>
       </div>
-      <div class="pillar-strip">
-        <div class="pillar-card">
-          <small>01 · MAP + GRAPH</small>
-          <span class="pillar-title lang-zh">地图与图谱并存</span><span class="pillar-title lang-en">Map meets graph</span>
-          <p class="pillar-desc">
-            <span class="lang-zh">Mars2D 打点联动 BuildingDetail，vis-network 展开建筑 / 构件 / 年代 / 城市的关系。</span>
-            <span class="lang-en">Mars2D markers link to BuildingDetail; vis-network unfolds building / component / era / city relations.</span>
-          </p>
+      <div class="gisauto-mini-card rb-spotlight">
+        <small>ARCHITECTURE</small>
+        <h3><span class="lang-zh">地图入口 · 图谱大脑</span><span class="lang-en">Map entry · graph brain</span></h3>
+        <p>
+          <span class="lang-zh">Vue 3 + Mars2D 前端，FastAPI 路由，Neo4j 存储建筑、构件、城市与年代关系。</span>
+          <span class="lang-en">Vue 3 + Mars2D front end, FastAPI router, Neo4j relations across buildings, components, cities, and eras.</span>
+        </p>
+        <div style="margin-top:.65rem; display:flex; flex-wrap:wrap; gap:.3rem">
+          <span class="chip">Vue 3</span><span class="chip">Mars2D</span><span class="chip">FastAPI</span><span class="chip">Neo4j</span><span class="chip">Docker</span>
         </div>
-        <div class="pillar-card">
-          <small>02 · RAG AGENT</small>
-          <span class="pillar-title lang-zh">4 通路多模态检索</span><span class="pillar-title lang-en">4-lane multimodal RAG</span>
-          <p class="pillar-desc">
-            <span class="lang-zh">关键词 + BGE 文本向量 + CLIP 图像 + CLIP 构件四路并行，DeepSeek-V3 融合答复。</span>
-            <span class="lang-en">Keyword + BGE text + CLIP image + CLIP component lanes fused by DeepSeek-V3.</span>
-          </p>
-        </div>
-        <div class="pillar-card">
-          <small>03 · ZERO-SHOT VISION</small>
-          <span class="pillar-title lang-zh">28 类构件检测</span><span class="pillar-title lang-en">28-class detection</span>
-          <p class="pillar-desc">
-            <span class="lang-zh">Grounding DINO 定位飞檐、斗拱、马头墙，CLIP 向量写回 Neo4j 供图像检索。</span>
-            <span class="lang-en">Grounding DINO localizes cornices, dougong, horse-head walls; CLIP vectors write back to Neo4j.</span>
-          </p>
+      </div>
+      <div class="gisauto-mini-card rb-spotlight">
+        <small>AGENT WORKFLOW</small>
+        <h3><span class="lang-zh">4 通路 RAG · 可追溯回答</span><span class="lang-en">4-lane RAG · grounded replies</span></h3>
+        <p>
+          <span class="lang-zh">关键词、BGE 文本、CLIP 图像、CLIP 构件并行检索，DeepSeek-V3 融合答复并回指证据。</span>
+          <span class="lang-en">Keyword, BGE text, CLIP image, and CLIP component lanes are fused by DeepSeek-V3 with evidence traces.</span>
+        </p>
+        <div style="margin-top:.65rem; display:flex; flex-wrap:wrap; gap:.3rem">
+          <span class="chip">BGE</span><span class="chip">CLIP</span><span class="chip">Grounding DINO</span><span class="chip">DeepSeek-V3</span>
         </div>
       </div>
     </div>
@@ -1145,7 +1732,7 @@
 <!-- =========================================================
   SLIDE 3 · ARCHITECTURE + AGENT (combined)
 ========================================================= -->
-<section class="slide paper grain" id="s3">
+<section class="slide paper grain archived-slide" id="s3">
   <div class="combo-wrap">
     <div class="combo-head">
       <div class="eyebrow">Architecture &middot; Agent &middot; 02</div>
@@ -1231,63 +1818,61 @@
   SLIDE 7 · PUBLICATIONS
 ========================================================= -->
 <section class="slide paper grain" id="s7">
-  <div style="width:100%; max-width:1280px">
-    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2.5rem">
+  <div class="work-wrap">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap">
       <div>
-        <div class="eyebrow"><span class="lang-zh">学术产出</span><span class="lang-en">Publications</span> · 04</div>
-        <h2 class="display" style="font-size:2.8rem; margin-top:.75rem">
-          <span class="lang-zh">两篇会议论文 &middot; 四项发明专利</span>
-          <span class="lang-en">Two conference papers &middot; four patents</span>
+        <div class="eyebrow"><span class="lang-zh">成果与项目</span><span class="lang-en">Work</span> · 02</div>
+        <h2 class="display" style="font-size:2.6rem; margin-top:.65rem">
+          <span class="lang-zh">论文、专利与工程项目放在一起看</span>
+          <span class="lang-en">Papers, IP, and project work in one view</span>
         </h2>
       </div>
       <div class="rule" style="flex:1; min-width:200px; margin-bottom:1rem"></div>
     </div>
 
-    <div style="display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:1.5rem">
-      <div class="card" style="background:linear-gradient(135deg, #9C0000 0%, #7a0000 100%); color:#fff; border:none">
-        <div class="eyebrow" style="color:rgba(255,255,255,.8)">First author &middot; VINCI 2025</div>
-        <h3 class="display" style="font-size:2rem; margin-top:.75rem">HeritageExplorer</h3>
-        <p style="font-size:.85rem; color:rgba(255,255,255,.85); line-height:1.7; margin-top:.75rem">
-          <span class="lang-zh">广州 831 处历史建筑的多模态交互式可视化与对话系统。量化评估在三类遗产任务中事实准确性稳定提升。GISauto 是其扩展至广西并工程化部署的版本。</span>
-          <span class="lang-en">An interactive visualization + dialogue system over 831 Guangzhou heritage buildings. Quantitative studies show stable gains in factual accuracy across three heritage tasks. GISauto is its Guangxi-scale, production-ready extension.</span>
-        </p>
-        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.15); font-size:.75rem; color:rgba(255,255,255,.8)">
-          DOI &middot; <a href="https://doi.org/10.1145/3769534.3769571" target="_blank" style="color:#fff; text-decoration:underline">10.1145/3769534.3769571</a>
+    <div class="work-grid">
+      <div class="paper-stack">
+        <div class="work-card featured">
+          <div class="eyebrow" style="color:rgba(255,255,255,.82); font-size:.62rem">First author · VINCI 2025</div>
+          <h3>HeritageExplorer</h3>
+          <p>
+            <span class="lang-zh">广州 831 处历史建筑的多模态交互式可视化与对话系统。GISauto 是其扩展至广西并工程化部署的版本。</span>
+            <span class="lang-en">Interactive visualization + dialogue for 831 Guangzhou heritage buildings; GISauto is the Guangxi-scale production extension.</span>
+          </p>
+          <div style="margin-top:.75rem; font-size:.7rem; color:rgba(255,255,255,.8)">DOI · <a href="https://doi.org/10.1145/3769534.3769571" target="_blank" style="color:#fff; text-decoration:underline">10.1145/3769534.3769571</a></div>
+        </div>
+        <div class="work-card">
+          <div class="eyebrow" style="font-size:.62rem">Co-author · CHI 2025</div>
+          <h3>GenColor</h3>
+          <p>
+            <span class="lang-zh">基于文生图扩散模型的生成式框架，自动提取与语境相关的设计配色方案。</span>
+            <span class="lang-en">A text-to-image diffusion framework that extracts context-specific color palettes for visual design.</span>
+          </p>
+          <div style="margin-top:.65rem; display:flex; gap:.35rem; flex-wrap:wrap">
+            <span class="chip" style="font-size:.65rem">Diffusion</span>
+            <span class="chip" style="font-size:.65rem">Color Design</span>
+            <span class="chip" style="font-size:.65rem">HCI</span>
+          </div>
+        </div>
+        <div class="work-card" style="display:grid; grid-template-columns:1fr 1fr; gap:.85rem; background:rgba(156,0,0,.04); border-color:rgba(156,0,0,.14)">
+          <div>
+            <div class="eyebrow" style="font-size:.62rem"><span class="lang-zh">知识产权</span><span class="lang-en">IP</span></div>
+            <div style="margin-top:.45rem; display:flex; align-items:baseline; gap:.45rem"><span class="stat-big" style="font-size:2.4rem">4</span><span style="font-size:.76rem; color:rgba(26,26,26,.64)"><span class="lang-zh">发明专利</span><span class="lang-en">patents</span></span></div>
+          </div>
+          <div>
+            <div class="eyebrow" style="font-size:.62rem"><span class="lang-zh">软件</span><span class="lang-en">Software</span></div>
+            <div style="margin-top:.45rem; display:flex; align-items:baseline; gap:.45rem"><span class="stat-big" style="font-size:2.4rem">1</span><span style="font-size:.76rem; color:rgba(26,26,26,.64)"><span class="lang-zh">软著</span><span class="lang-en">copyright</span></span></div>
+          </div>
         </div>
       </div>
 
-      <div class="card">
-        <div class="eyebrow" style="font-size:.65rem">Co-author &middot; CHI 2025</div>
-        <h3 class="display" style="font-size:1.6rem; margin-top:.75rem">GenColor</h3>
-        <p style="font-size:.82rem; color:rgba(26,26,26,.7); line-height:1.7; margin-top:.75rem">
-          <span class="lang-zh">基于文生图扩散模型的生成式框架，自动提取与具体语境相关的设计配色方案。</span>
-          <span class="lang-en">A generative framework built on text-to-image diffusion that extracts context-specific color palettes for visual design.</span>
-        </p>
-        <div style="margin-top:1.25rem; display:flex; gap:.4rem; flex-wrap:wrap">
-          <span class="chip" style="font-size:.65rem">Diffusion</span>
-          <span class="chip" style="font-size:.65rem">Color Design</span>
-          <span class="chip" style="font-size:.65rem">HCI</span>
-        </div>
-      </div>
-
-      <div class="card" style="background:rgba(156,0,0,.04); border-color:rgba(156,0,0,.15)">
-        <div class="eyebrow" style="font-size:.65rem"><span class="lang-zh">知识产权</span><span class="lang-en">IP</span></div>
-        <div style="margin-top:.75rem; display:flex; align-items:baseline; gap:.5rem">
-          <div class="stat-big" style="font-size:3rem">4</div>
-          <div style="font-size:.82rem; color:rgba(26,26,26,.7)">
-            <span class="lang-zh">项发明专利</span><span class="lang-en">patents</span>
-          </div>
-        </div>
-        <div style="margin-top:.3rem; display:flex; align-items:baseline; gap:.5rem">
-          <div class="stat-big" style="font-size:3rem">1</div>
-          <div style="font-size:.82rem; color:rgba(26,26,26,.7)">
-            <span class="lang-zh">项软件著作权</span><span class="lang-en">software copyright</span>
-          </div>
-        </div>
-        <p style="margin-top:.9rem; font-size:.72rem; color:rgba(26,26,26,.6); line-height:1.6">
-          <span class="lang-zh">危化品云数据联动平台 &middot; 光伏故障诊断 &middot; 光伏电站监控 &middot; 异常定位方法</span>
-          <span class="lang-en">Hazardous-chemical cloud platform &middot; PV fault diagnosis &middot; PV station monitoring &middot; anomaly localization</span>
-        </p>
+      <div class="project-stack">
+        <div class="project-mini"><span class="num">01</span><div><b><span class="lang-zh">危化品云数据联动装置</span><span class="lang-en">Hazardous-chemical cloud sensor</span></b><p><span class="lang-zh">CH4/CO2/温湿度 + 摄像头多传感器融合。</span><span class="lang-en">CH4/CO2/T&amp;H plus camera sensor fusion.</span></p></div><time>2020–22</time></div>
+        <div class="project-mini"><span class="num">02</span><div><b><span class="lang-zh">消防管理智能感知设备</span><span class="lang-en">Smart fire-safety sensor</span></b><p><span class="lang-zh">场景自适应配置，CSMA/CA 载波侦听。</span><span class="lang-en">Scene-adaptive config with CSMA/CA sensing.</span></p></div><time>2020–22</time></div>
+        <div class="project-mini"><span class="num">03</span><div><b><span class="lang-zh">振弦式钢筋计无线测力</span><span class="lang-en">Wireless force sensor</span></b><p><span class="lang-zh">LoRa 深基坑支撑轴力无线监测。</span><span class="lang-en">LoRa axial-force monitoring for deep-pit struts.</span></p></div><time>2021–22</time></div>
+        <div class="project-mini"><span class="num">04</span><div><b><span class="lang-zh">虹桥站客流检测</span><span class="lang-en">Hongqiao passenger flow</span></b><p><span class="lang-zh">蓝牙实时热力图，高峰预警与规划依据。</span><span class="lang-en">Bluetooth heatmaps for peak-hour alerting.</span></p></div><time>2020–21</time></div>
+        <div class="project-mini"><span class="num">05</span><div><b><span class="lang-zh">光伏运维平台</span><span class="lang-en">PV O&amp;M platform</span></b><p><span class="lang-zh">互联网+ 大赛，光伏故障监测与修复。</span><span class="lang-en">Internet+ contest, PV fault monitoring.</span></p></div><time>2019</time></div>
+        <div class="project-mini"><span class="num">06</span><div><b><span class="lang-zh">智慧农业</span><span class="lang-en">Smart agriculture</span></b><p><span class="lang-zh">果园病虫害检测与反馈管理平台。</span><span class="lang-en">Orchard pest detection and feedback platform.</span></p></div><time>2017</time></div>
       </div>
     </div>
   </div>
@@ -1296,7 +1881,7 @@
 <!-- =========================================================
   SLIDE 8 · EXPERIENCE (HORIZONTAL TIMELINE, DARK)
 ========================================================= -->
-<section class="slide ink grain" id="s8">
+<section class="slide ink grain archived-slide" id="s8">
   <div style="width:100%; max-width:1300px">
     <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">经历</span><span class="lang-en">Experience</span> · 05</div>
     <h2 class="display" style="font-size:2.8rem; margin-top:.75rem">
@@ -1362,7 +1947,7 @@
 <!-- =========================================================
   SLIDE 9 · OTHER PROJECTS
 ========================================================= -->
-<section class="slide paper grain" id="s9">
+<section class="slide paper grain archived-slide" id="s9">
   <div style="width:100%; max-width:1300px">
     <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2rem">
       <div>
@@ -1464,7 +2049,7 @@
   <div style="width:100%; max-width:1300px">
     <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2.5rem">
       <div>
-        <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">工具链</span><span class="lang-en">Toolbox</span> · 07</div>
+        <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">工具链</span><span class="lang-en">Toolbox</span> · 03</div>
         <h2 class="display" style="font-size:2.8rem; margin-top:.75rem">
           <span class="lang-zh">从 PCB 到 Prompt</span><span class="lang-en">From PCB to Prompt</span>
         </h2>
@@ -1548,7 +2133,7 @@
 ========================================================= -->
 <section class="slide paper grain" id="s11">
   <div style="width:100%; max-width:1100px; text-align:left">
-    <div class="eyebrow"><span class="lang-zh">联系</span><span class="lang-en">Contact</span> · 08</div>
+    <div class="eyebrow"><span class="lang-zh">联系</span><span class="lang-en">Contact</span> · 04</div>
     <h2 class="display" style="font-size:clamp(3rem, 5vw, 5rem); margin-top:1rem; line-height:1.05">
       <span class="lang-zh">一起把<span style="color:#9C0000">历史</span><br/>装进<span style="color:#9C0000">下一个模型</span>。</span>
       <span class="lang-en">Let&apos;s put <span style="color:#9C0000">history</span><br/>into the <span style="color:#9C0000">next model</span>.</span>
@@ -1601,16 +2186,13 @@
   const progress = document.getElementById('progress');
   const slideCounter = document.getElementById('slideCounter');
   const navLinks = document.querySelectorAll('.nav-link');
-  const slides = document.querySelectorAll('.slide');
+  const slides = document.querySelectorAll('.slide:not(.archived-slide)');
   const total = slides.length;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const railLabels = [
     ['首页', 'Home'],
     ['GISauto', 'GISauto'],
-    ['架构·Agent', 'Arch·Agent'],
-    ['论文', 'Papers'],
-    ['经历', 'Timeline'],
-    ['项目', 'Projects'],
+    ['成果·项目', 'Work'],
     ['技能', 'Skills'],
     ['联系', 'Contact']
   ];
@@ -1619,10 +2201,7 @@
     { start: 1, end: 1 },
     { start: 2, end: 2 },
     { start: 3, end: 3 },
-    { start: 4, end: 4 },
-    { start: 5, end: 5 },
-    { start: 6, end: 6 },
-    { start: 7, end: 7 }
+    { start: 4, end: 4 }
   ];
 
   function setupReactBitsMotion() {
@@ -1664,17 +2243,17 @@
       slide.prepend(field);
     });
 
-    document.querySelectorAll('.slide h2.display:not(.gisauto-title), .slide h3.display').forEach((el, i) => {
+    document.querySelectorAll('.slide:not(.archived-slide) h2.display:not(.gisauto-title), .slide:not(.archived-slide) h3.display').forEach((el, i) => {
       el.classList.add('rb-reveal', 'rb-blur-text');
       el.style.setProperty('--rb-delay', `${Math.min(i % 4, 3) * 80}ms`);
     });
 
-    document.querySelectorAll('.card, .pillar-card, .combo-pane, .combo-chat').forEach((el, i) => {
+    document.querySelectorAll('.slide:not(.archived-slide) .card, .slide:not(.archived-slide) .pillar-card, .slide:not(.archived-slide) .combo-pane, .slide:not(.archived-slide) .combo-chat, .slide:not(.archived-slide) .work-card, .slide:not(.archived-slide) .project-mini, .slide:not(.archived-slide) .gisauto-mini-card').forEach((el, i) => {
       el.classList.add('rb-reveal', 'rb-spotlight');
       el.style.setProperty('--rb-delay', `${Math.min(i % 6, 5) * 70}ms`);
     });
 
-    document.querySelectorAll('.card, .combo-pane').forEach((el) => el.classList.add('rb-tilt'));
+    document.querySelectorAll('.slide:not(.archived-slide) .card, .slide:not(.archived-slide) .combo-pane, .slide:not(.archived-slide) .work-card, .slide:not(.archived-slide) .project-mini, .slide:not(.archived-slide) .gisauto-mini-card').forEach((el) => el.classList.add('rb-tilt'));
     document.querySelectorAll('.hero-copy .chip, .hero-tag, .combo-num').forEach((el) => el.classList.add('rb-shiny-text'));
     document.querySelectorAll('.rb-split-text').forEach(splitTextElement);
     setupSpotlight();
@@ -1792,9 +2371,32 @@
     document.querySelectorAll('.rb-reveal, .rb-blur-text, .rb-split-text').forEach((el) => observer.observe(el));
   }
 
+  function setupBootIntro() {
+    const intro = document.getElementById('bootIntro');
+    if (!intro || !document.documentElement.classList.contains('boot-intro-enabled')) return;
+    const skip = document.getElementById('bootSkip');
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      intro.classList.add('is-done');
+      try { sessionStorage.setItem('portfolioBootIntro', 'done'); } catch (error) {}
+      window.setTimeout(() => intro.remove(), 650);
+    };
+    skip?.addEventListener('click', finish);
+    window.setTimeout(finish, 2850);
+  }
+
   setupReactBitsMotion();
+  setupBootIntro();
 
   // Build rail dots
+  const railGoo = document.createElement('div');
+  railGoo.className = 'rail-goo-layer';
+  railGoo.setAttribute('aria-hidden', 'true');
+  railGoo.innerHTML = '<span class="rail-goo-main"></span><span class="rail-goo-hover"></span><span class="rail-goo-dot"></span>';
+  rail.appendChild(railGoo);
+
   for (let i = 0; i < total; i++) {
     const b = document.createElement('button');
     b.dataset.i = i;
@@ -1804,12 +2406,28 @@
     label.innerHTML = `<span class="lang-zh">${railLabels[i]?.[0] || i + 1}</span><span class="lang-en">${railLabels[i]?.[1] || i + 1}</span>`;
     b.appendChild(label);
     b.addEventListener('click', () => goTo(i));
+    b.addEventListener('mouseenter', () => updateRailGoo(b, true));
+    b.addEventListener('focus', () => updateRailGoo(b, true));
     rail.appendChild(b);
   }
+  rail.addEventListener('mouseleave', () => {
+    const active = rail.querySelector('button.active');
+    if (active) updateRailGoo(active, true);
+  });
 
   navLinks.forEach((link) => {
     link.addEventListener('click', () => goTo(Number(link.dataset.target || 0)));
   });
+
+  function updateRailGoo(button, hoverOnly = false) {
+    if (!button) return;
+    const y = `${button.offsetTop}px`;
+    rail.style.setProperty('--gooey-hover-y', y);
+    rail.style.setProperty('--gooey-h', `${button.offsetHeight}px`);
+    if (!hoverOnly || button.classList.contains('active')) {
+      rail.style.setProperty('--gooey-y', y);
+    }
+  }
 
   function goTo(i) {
     i = Math.max(0, Math.min(total - 1, i));
@@ -1834,6 +2452,7 @@
     rail.querySelectorAll('button').forEach((b, idx) => {
       b.classList.toggle('active', idx === i);
     });
+    updateRailGoo(rail.querySelector('button.active'));
     navLinks.forEach((link, idx) => {
       const stop = navStops[idx];
       link.classList.toggle('active', !!stop && i >= stop.start && i <= stop.end);
@@ -1886,6 +2505,7 @@
   window.addEventListener('resize', () => {
     if (window.matchMedia('(max-width: 900px)').matches) return;
     deck.scrollLeft = current * window.innerWidth;
+    requestAnimationFrame(() => updateRailGoo(rail.querySelector('button.active')));
   });
 </script>
 </body>
