@@ -28,7 +28,38 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
 <style>
-  :root { color-scheme: light; --accent:#9C0000; --ink:#1a1a1a; --paper:#faf7f2; }
+  :root {
+    color-scheme: light;
+    --accent:#9C0000;
+    --ink:#1a1a1a;
+    --paper:#faf7f2;
+    --linear-ease: linear(
+      0,
+      0.068,
+      0.19 2.7%,
+      0.804 8.1%,
+      1.037,
+      1.199 13.2%,
+      1.245,
+      1.27 15.8%,
+      1.274,
+      1.272 17.4%,
+      1.249 19.1%,
+      0.996 28%,
+      0.949,
+      0.928 33.3%,
+      0.926,
+      0.933 36.8%,
+      1.001 45.6%,
+      1.013,
+      1.019 50.8%,
+      1.018 54.4%,
+      1 63.1%,
+      0.995 68%,
+      1.001 85%,
+      1
+    );
+  }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   html{scroll-behavior:smooth}
@@ -229,74 +260,82 @@
   .rail{
     position:fixed; left:1.1rem; top:50%; transform:translateY(-50%);
     z-index:40;
-    display:flex; flex-direction:column; gap:.45rem;
-    --gooey-y:0px;
-    --gooey-hover-y:0px;
-    --gooey-h:36px;
-    --gooey-dark:#680000;
-    --gooey-mid:#8b0707;
+    width:172px;
+    --color-1:#680000;
+    --color-2:#8b0707;
+    --color-3:#b01818;
+    --color-4:#f0cbc4;
     isolation:isolate;
+    transform-style:preserve-3d;
   }
-  .rail-goo-layer{
-    position:absolute;
-    inset:-10px -12px;
-    pointer-events:none;
-    z-index:0;
-    filter:url(#gooey-nav-filter);
+  .rail nav{
+    display:flex;
+    position:relative;
+    transform:translate3d(0,0,.01px);
   }
-  .rail-goo-main,
-  .rail-goo-hover,
-  .rail-goo-dot{
-    position:absolute;
+  .rail ul{
+    display:flex;
+    flex-direction:column;
+    gap:.45rem;
+    list-style:none;
+    margin:0;
+    padding:0;
+    position:relative;
+    z-index:3;
+    width:100%;
+  }
+  .rail li{
     border-radius:999px;
-    background:var(--gooey-dark);
-    transform:translate3d(0, var(--gooey-y), 0);
-    transition:transform .46s cubic-bezier(.2,.86,.18,1), width .36s ease, opacity .24s ease;
+    position:relative;
+    color:rgba(26,26,26,.58);
+    cursor:pointer;
+    transition:
+      color .3s ease,
+      filter .3s ease,
+      transform .3s ease,
+      box-shadow .3s ease;
+    box-shadow:0 0 .5px 1.5px transparent;
+    transform:translate3d(0,0,.01px);
   }
-  .rail-goo-main{
-    left:10px;
-    top:10px;
-    width:164px;
-    height:var(--gooey-h);
-    box-shadow:0 18px 32px -22px rgba(104,0,0,.9);
-  }
-  .rail-goo-hover{
-    left:10px;
-    top:10px;
-    width:164px;
-    height:var(--gooey-h);
+  .rail li::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:999px;
+    background:linear-gradient(135deg, #680000 0%, #9c0000 62%, #b91919 100%);
     opacity:0;
-    background:var(--gooey-mid);
-    transform:translate3d(0, var(--gooey-hover-y), 0) scale(.96);
+    transform:scale(.82);
+    transition:all .3s ease;
+    z-index:-1;
+    box-shadow:0 20px 36px -22px rgba(104,0,0,.92);
   }
-  .rail:hover .rail-goo-hover{
-    opacity:.72;
+  .rail li.active{
+    color:#fff;
+    text-shadow:none;
+    transform:translateX(6px);
   }
-  .rail-goo-dot{
-    width:14px;
-    height:14px;
-    left:158px;
-    top:21px;
-    opacity:.72;
-    background:#a31414;
-    animation:rail-goo-orbit 3.2s ease-in-out infinite;
-  }
-  @keyframes rail-goo-orbit{
-    0%,100%{transform:translate3d(-4px, calc(var(--gooey-y) - 1px), 0) scale(.75)}
-    50%{transform:translate3d(8px, calc(var(--gooey-y) + 3px), 0) scale(1)}
+  .rail li.active::after{
+    opacity:1;
+    transform:scale(1);
   }
   .rail button{
     width:164px; min-height:36px; border-radius:999px;
     position:relative;
-    z-index:1;
+    z-index:2;
     background:rgba(255,255,255,.68);
     border:1px solid rgba(156,0,0,.08);
-    cursor:pointer; transition:all .25s;
+    cursor:pointer;
+    transition:
+      color .25s ease,
+      background .25s ease,
+      border-color .25s ease,
+      box-shadow .25s ease;
     display:flex; align-items:center; gap:.45rem;
     padding:.38rem .72rem;
-    color:rgba(26,26,26,.56);
+    color:inherit;
     box-shadow:0 10px 30px -26px rgba(26,26,26,.65), inset 0 1px 0 rgba(255,255,255,.64);
     backdrop-filter:blur(8px);
+    text-align:left;
   }
   .rail button::before{
     content:attr(data-num);
@@ -313,24 +352,155 @@
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
     font-size:.8rem; font-weight:800;
   }
-  .rail button:hover{
+  .rail li:hover{
     color:#fff;
+  }
+  .rail li:hover button{
     background:rgba(104,0,0,.12);
     border-color:rgba(104,0,0,.22);
-    transform:translateX(3px);
   }
-  .rail button.active{
+  .rail li.active button{
     background:transparent;
     color:#fff;
     border-color:transparent;
-    transform:translateX(6px);
     box-shadow:none;
   }
-  .rail button.active::before,
-  .rail button:hover::before{
+  .rail li.active button::before,
+  .rail li:hover button::before{
     background:rgba(255,255,255,.18);
     color:#fff;
     transform:scale(.96);
+  }
+  .rail .effect{
+    position:absolute;
+    left:0;
+    top:0;
+    width:0;
+    height:0;
+    opacity:1;
+    pointer-events:none;
+    display:grid;
+    place-items:center;
+    z-index:1;
+    border-radius:999px;
+    overflow:visible;
+  }
+  .rail .effect.text{
+    color:#fff;
+    z-index:2;
+    text-shadow:0 1px 1px rgba(30,0,0,.25);
+    transition:color .3s ease;
+    opacity:0;
+  }
+  .rail .effect.text .rail-effect-copy{
+    width:164px;
+    min-height:36px;
+    border-radius:999px;
+    display:flex;
+    align-items:center;
+    gap:.45rem;
+    padding:.38rem .72rem;
+    font-size:.8rem;
+    font-weight:800;
+    opacity:.92;
+    transform:translateX(6px);
+  }
+  .rail .effect.text .rail-effect-copy::before{
+    content:attr(data-num);
+    width:23px;
+    height:23px;
+    border-radius:999px;
+    display:grid;
+    place-items:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.68rem;
+    font-weight:800;
+    background:rgba(255,255,255,.18);
+    flex-shrink:0;
+  }
+  .rail .effect.filter{
+    filter:blur(5px) contrast(22) saturate(1.35);
+    mix-blend-mode:normal;
+  }
+  .rail .effect.filter::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg, #680000 0%, #9c0000 62%, #b91919 100%);
+    transform:scale(0);
+    opacity:0;
+    z-index:-1;
+    border-radius:999px;
+  }
+  .rail .effect.active::after{
+    animation:rail-pill .3s ease both;
+  }
+  @keyframes rail-pill{
+    to{transform:scale(1); opacity:1}
+  }
+  .rail .particle,
+  .rail .point{
+    display:block;
+    opacity:0;
+    width:20px;
+    height:20px;
+    border-radius:100%;
+    transform-origin:center;
+  }
+  .rail .particle{
+    --time:5s;
+    position:absolute;
+    top:calc(50% - 10px);
+    left:calc(50% - 10px);
+    animation:rail-particle calc(var(--time)) ease 1 -350ms;
+  }
+  .rail .point{
+    background:var(--color);
+    opacity:1;
+    box-shadow:0 0 18px color-mix(in srgb, var(--color), transparent 30%);
+    animation:rail-point calc(var(--time)) ease 1 -350ms;
+  }
+  @keyframes rail-particle{
+    0%{
+      transform:rotate(0deg) translate(calc(var(--start-x)), calc(var(--start-y)));
+      opacity:1;
+      animation-timing-function:cubic-bezier(.55,0,1,.45);
+    }
+    70%{
+      transform:rotate(calc(var(--rotate) * .5)) translate(calc(var(--end-x) * 1.2), calc(var(--end-y) * 1.2));
+      opacity:1;
+      animation-timing-function:ease;
+    }
+    85%{
+      transform:rotate(calc(var(--rotate) * .66)) translate(calc(var(--end-x)), calc(var(--end-y)));
+      opacity:1;
+    }
+    100%{
+      transform:rotate(calc(var(--rotate) * 1.2)) translate(calc(var(--end-x) * .5), calc(var(--end-y) * .5));
+      opacity:1;
+    }
+  }
+  @keyframes rail-point{
+    0%{
+      transform:scale(0);
+      opacity:0;
+      animation-timing-function:cubic-bezier(.55,0,1,.45);
+    }
+    25%{transform:scale(calc(var(--scale) * .25))}
+    38%{opacity:1}
+    65%{
+      transform:scale(var(--scale));
+      opacity:1;
+      animation-timing-function:ease;
+    }
+    85%{
+      transform:scale(var(--scale));
+      opacity:1;
+    }
+    100%{
+      transform:scale(0);
+      opacity:0;
+    }
   }
 
   /* Progress */
@@ -1446,6 +1616,13 @@
     .boot-line{
       animation:none !important;
     }
+    .rail .particle,
+    .rail .point{
+      display:none !important;
+    }
+    .rail .effect.filter{
+      filter:none !important;
+    }
   }
 
   /* Mobile */
@@ -2390,43 +2567,134 @@
   setupReactBitsMotion();
   setupBootIntro();
 
-  // Build rail dots
-  const railGoo = document.createElement('div');
-  railGoo.className = 'rail-goo-layer';
-  railGoo.setAttribute('aria-hidden', 'true');
-  railGoo.innerHTML = '<span class="rail-goo-main"></span><span class="rail-goo-hover"></span><span class="rail-goo-dot"></span>';
-  rail.appendChild(railGoo);
+  // React Bits GooeyNav adapted for the vertical rail.
+  const railNav = document.createElement('nav');
+  const railList = document.createElement('ul');
+  const railEffectFilter = document.createElement('span');
+  const railEffectText = document.createElement('span');
+  const railGooOptions = {
+    animationTime: 600,
+    particleCount: 15,
+    particleDistances: [90, 10],
+    particleR: 100,
+    timeVariance: 300,
+    colors: [1, 2, 3, 1, 2, 3, 1, 4]
+  };
+  railEffectFilter.className = 'effect filter';
+  railEffectFilter.setAttribute('aria-hidden', 'true');
+  railEffectText.className = 'effect text';
+  railEffectText.setAttribute('aria-hidden', 'true');
+  railNav.appendChild(railList);
+  rail.append(railNav, railEffectFilter, railEffectText);
 
   for (let i = 0; i < total; i++) {
+    const item = document.createElement('li');
+    item.className = 'rail-item';
+    item.dataset.i = i;
     const b = document.createElement('button');
+    b.type = 'button';
     b.dataset.i = i;
     b.dataset.num = String(i + 1).padStart(2, '0');
     b.setAttribute('aria-label', railLabels[i]?.[0] || `Slide ${i + 1}`);
     const label = document.createElement('span');
     label.innerHTML = `<span class="lang-zh">${railLabels[i]?.[0] || i + 1}</span><span class="lang-en">${railLabels[i]?.[1] || i + 1}</span>`;
     b.appendChild(label);
-    b.addEventListener('click', () => goTo(i));
-    b.addEventListener('mouseenter', () => updateRailGoo(b, true));
-    b.addEventListener('focus', () => updateRailGoo(b, true));
-    rail.appendChild(b);
+    b.addEventListener('click', () => {
+      activateRailGoo(item);
+      goTo(i);
+    });
+    item.appendChild(b);
+    railList.appendChild(item);
   }
-  rail.addEventListener('mouseleave', () => {
-    const active = rail.querySelector('button.active');
-    if (active) updateRailGoo(active, true);
-  });
 
   navLinks.forEach((link) => {
     link.addEventListener('click', () => goTo(Number(link.dataset.target || 0)));
   });
 
-  function updateRailGoo(button, hoverOnly = false) {
-    if (!button) return;
-    const y = `${button.offsetTop}px`;
-    rail.style.setProperty('--gooey-hover-y', y);
-    rail.style.setProperty('--gooey-h', `${button.offsetHeight}px`);
-    if (!hoverOnly || button.classList.contains('active')) {
-      rail.style.setProperty('--gooey-y', y);
+  function railNoise(n = 1) {
+    return n / 2 - Math.random() * n;
+  }
+
+  function getRailParticleXY(distance, pointIndex, totalPoints) {
+    const angle = ((360 + railNoise(8)) / totalPoints) * pointIndex * (Math.PI / 180);
+    return [distance * Math.cos(angle), distance * Math.sin(angle)];
+  }
+
+  function createRailParticle(i, t, d, r) {
+    const rotate = railNoise(r / 10);
+    return {
+      start: getRailParticleXY(d[0], railGooOptions.particleCount - i, railGooOptions.particleCount),
+      end: getRailParticleXY(d[1] + railNoise(7), railGooOptions.particleCount - i, railGooOptions.particleCount),
+      time: t,
+      scale: 1 + railNoise(.2),
+      color: railGooOptions.colors[Math.floor(Math.random() * railGooOptions.colors.length)],
+      rotate: rotate > 0 ? (rotate + r / 20) * 10 : (rotate - r / 20) * 10
+    };
+  }
+
+  function clearRailParticles() {
+    railEffectFilter.querySelectorAll('.particle').forEach((particle) => particle.remove());
+  }
+
+  function makeRailParticles(element) {
+    if (reduceMotion) return;
+    const d = railGooOptions.particleDistances;
+    const r = railGooOptions.particleR;
+    const bubbleTime = railGooOptions.animationTime * 2 + railGooOptions.timeVariance;
+    element.style.setProperty('--time', `${bubbleTime}ms`);
+
+    for (let i = 0; i < railGooOptions.particleCount; i++) {
+      const t = railGooOptions.animationTime * 2 + railNoise(railGooOptions.timeVariance * 2);
+      const particleData = createRailParticle(i, t, d, r);
+      element.classList.remove('active');
+
+      window.setTimeout(() => {
+        const particle = document.createElement('span');
+        const point = document.createElement('span');
+        particle.classList.add('particle');
+        particle.style.setProperty('--start-x', `${particleData.start[0]}px`);
+        particle.style.setProperty('--start-y', `${particleData.start[1]}px`);
+        particle.style.setProperty('--end-x', `${particleData.end[0]}px`);
+        particle.style.setProperty('--end-y', `${particleData.end[1]}px`);
+        particle.style.setProperty('--time', `${particleData.time}ms`);
+        particle.style.setProperty('--scale', `${particleData.scale}`);
+        particle.style.setProperty('--color', `var(--color-${particleData.color}, #9c0000)`);
+        particle.style.setProperty('--rotate', `${particleData.rotate}deg`);
+
+        point.classList.add('point');
+        particle.appendChild(point);
+        element.appendChild(particle);
+        requestAnimationFrame(() => element.classList.add('active'));
+        window.setTimeout(() => particle.remove(), t);
+      }, 30);
     }
+  }
+
+  function updateRailEffectPosition(item) {
+    if (!item) return;
+    const containerRect = rail.getBoundingClientRect();
+    const pos = item.getBoundingClientRect();
+    const styles = {
+      left: `${pos.x - containerRect.x}px`,
+      top: `${pos.y - containerRect.y}px`,
+      width: `${pos.width}px`,
+      height: `${pos.height}px`
+    };
+    Object.assign(railEffectFilter.style, styles);
+    Object.assign(railEffectText.style, styles);
+    const button = item.querySelector('button');
+    const label = button?.querySelector('span')?.innerHTML || button?.innerText || '';
+    railEffectText.innerHTML = `<span class="rail-effect-copy" data-num="${button?.dataset.num || ''}">${label}</span>`;
+  }
+
+  function activateRailGoo(item) {
+    if (!item) return;
+    updateRailEffectPosition(item);
+    clearRailParticles();
+    railEffectText.classList.remove('active');
+    void railEffectText.offsetWidth;
+    railEffectText.classList.add('active');
+    makeRailParticles(railEffectFilter);
   }
 
   function goTo(i) {
@@ -2449,10 +2717,12 @@
       slide.classList.toggle('is-active', idx === i);
       if (idx === i) slide.querySelectorAll('.rb-decrypt').forEach(runDecrypt);
     });
-    rail.querySelectorAll('button').forEach((b, idx) => {
-      b.classList.toggle('active', idx === i);
+    rail.querySelectorAll('.rail-item').forEach((item, idx) => {
+      const active = idx === i;
+      item.classList.toggle('active', active);
+      item.querySelector('button')?.classList.toggle('active', active);
     });
-    updateRailGoo(rail.querySelector('button.active'));
+    updateRailEffectPosition(rail.querySelector('.rail-item.active'));
     navLinks.forEach((link, idx) => {
       const stop = navStops[idx];
       link.classList.toggle('active', !!stop && i >= stop.start && i <= stop.end);
@@ -2505,7 +2775,7 @@
   window.addEventListener('resize', () => {
     if (window.matchMedia('(max-width: 900px)').matches) return;
     deck.scrollLeft = current * window.innerWidth;
-    requestAnimationFrame(() => updateRailGoo(rail.querySelector('button.active')));
+    requestAnimationFrame(() => updateRailEffectPosition(rail.querySelector('.rail-item.active')));
   });
 </script>
 </body>
