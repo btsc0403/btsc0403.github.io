@@ -630,14 +630,14 @@
 
   /* GISauto slide redesigned layout */
   .gisauto-wrap{
-    width:100%;
-    max-width:1400px;
+    width:min(100%, calc(60vh * 2.0118), 1320px);
+    max-width:none;
     display:flex;
     flex-direction:column;
-    gap:1.25rem;
+    gap:.95rem;
   }
   @media (min-width: 901px){
-    #s2 .gisauto-wrap{transform:translateY(16px)}
+    #s2 .gisauto-wrap{transform:translateY(42px)}
   }
   .gisauto-head{
     display:flex;
@@ -665,8 +665,8 @@
   }
   .hero-shot-full{
     position:relative;
-    width:min(100%, calc(46vh * 2.0118));
-    margin:0 auto;
+    width:100%;
+    margin:0;
     border-radius:22px;
     overflow:hidden;
     background:
@@ -690,7 +690,7 @@
     display:block;
     width:100%;
     height:auto;
-    max-height:46vh;
+    max-height:none;
     object-fit:contain;
     object-position:center;
   }
@@ -739,8 +739,8 @@
     border:1px solid rgba(255,255,255,.12);
     border-radius:18px;
     background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
-    padding:1rem 1.1rem;
-    min-height:142px;
+    padding:.88rem 1rem;
+    min-height:128px;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
   }
   .gisauto-mini-card small{
