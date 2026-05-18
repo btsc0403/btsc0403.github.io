@@ -1389,7 +1389,7 @@
     50%{transform:rotate(18deg) scaleY(1.12)}
   }
 
-  /* Terminal-to-MacBook intro */
+  /* Command-line intro */
   .boot-intro{
     position:fixed;
     inset:0;
@@ -1404,7 +1404,7 @@
     color:#f7efe6;
     overflow:hidden;
     opacity:1;
-    transition:opacity .55s ease, visibility .55s ease;
+    transition:opacity .48s ease, visibility .48s ease;
   }
   html.boot-intro-enabled .boot-intro{display:flex}
   html.boot-intro-disabled .boot-intro{display:none}
@@ -1441,26 +1441,27 @@
   .boot-stage{
     position:relative;
     z-index:2;
-    width:min(860px, 86vw);
-    height:min(560px, 72vh);
+    width:min(980px, 90vw);
+    height:min(580px, 74vh);
     display:grid;
     place-items:center;
-    perspective:1200px;
   }
   .boot-device{
     position:relative;
-    width:min(760px, 82vw);
-    transform-style:preserve-3d;
-    animation:boot-device-flight 2.78s cubic-bezier(.2,.82,.16,1) forwards;
+    width:min(900px, 88vw);
+    animation:boot-terminal-arrive .64s cubic-bezier(.2,.82,.16,1) both;
   }
   .boot-screen{
     position:relative;
-    height:430px;
-    border-radius:22px;
-    padding:14px;
+    min-height:440px;
+    border-radius:18px;
+    padding:1px;
     background:linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.04));
-    border:1px solid rgba(255,255,255,.16);
-    box-shadow:0 42px 120px -46px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow:
+      0 44px 120px -46px rgba(0,0,0,.92),
+      0 0 0 1px rgba(156,0,0,.18),
+      inset 0 1px 0 rgba(255,255,255,.16);
     overflow:hidden;
   }
   .boot-screen::after{
@@ -1473,7 +1474,8 @@
   }
   .boot-terminal{
     height:100%;
-    border-radius:14px;
+    min-height:438px;
+    border-radius:17px;
     overflow:hidden;
     background:rgba(5,7,7,.92);
     border:1px solid rgba(255,255,255,.08);
@@ -1504,10 +1506,10 @@
   }
   .boot-code{
     margin:0;
-    padding:1.35rem 1.45rem;
+    padding:1.35rem 1.45rem .95rem;
     font-family:'JetBrains Mono', ui-monospace, Menlo, monospace;
-    font-size:clamp(.78rem, 1.5vw, 1.02rem);
-    line-height:1.8;
+    font-size:clamp(.76rem, 1.35vw, .98rem);
+    line-height:1.72;
     color:#f9f0e6;
   }
   .boot-line{
@@ -1521,6 +1523,7 @@
   .boot-prompt{color:#ff7979}
   .boot-ok{color:#79e2d1}
   .boot-muted{color:rgba(249,240,230,.62)}
+  .boot-warn{color:#f0c6bd}
   .boot-cursor{
     display:inline-block;
     width:.62em;
@@ -1537,28 +1540,74 @@
     0%,52%{opacity:1}
     53%,100%{opacity:0}
   }
-  .boot-base{
-    position:relative;
-    width:86%;
-    height:34px;
-    margin:0 auto;
-    border-radius:0 0 24px 24px;
-    background:linear-gradient(180deg, #d8d2c8, #7d756c);
-    box-shadow:0 34px 80px -34px rgba(0,0,0,.92);
+  .boot-progress{
+    margin:0 1.45rem 1.35rem;
+    padding:1rem;
+    border-radius:12px;
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow:inset 0 0 0 1px rgba(156,0,0,.12);
     opacity:0;
-    transform:translateY(-4px) rotateX(66deg);
-    transform-origin:top;
-    animation:boot-base-in 2.78s cubic-bezier(.2,.82,.16,1) forwards;
+    transform:translateY(10px);
+    animation:boot-progress-in .42s ease forwards;
+    animation-delay:1.08s;
   }
-  .boot-base::before{
-    content:"";
+  .boot-progress-head,
+  .boot-progress-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1rem;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .boot-progress-head{
+    color:#f7efe6;
+    font-size:.76rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .boot-progress-count::after{
+    content:"0%";
+    color:#79e2d1;
+    animation:boot-percent 2.75s steps(1,end) forwards;
+    animation-delay:1.16s;
+  }
+  .boot-progress-track{
+    position:relative;
+    height:13px;
+    margin:.82rem 0 .7rem;
+    border-radius:999px;
+    overflow:hidden;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  .boot-progress-fill{
     position:absolute;
-    left:42%;
-    top:0;
-    width:16%;
-    height:6px;
-    border-radius:0 0 10px 10px;
-    background:rgba(40,35,32,.38);
+    inset:0 auto 0 0;
+    width:0;
+    border-radius:inherit;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 7px, transparent 7px 14px),
+      linear-gradient(90deg, #680000 0%, #b20d0d 45%, #79e2d1 100%);
+    box-shadow:0 0 28px rgba(156,0,0,.48);
+    animation:boot-progress-fill 2.75s var(--linear-ease) forwards;
+    animation-delay:1.16s;
+  }
+  .boot-progress-scan{
+    position:absolute;
+    inset:-2px auto -2px 0;
+    width:72px;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.32), transparent);
+    transform:translateX(-80px);
+    animation:boot-progress-scan 2.75s ease-in-out forwards;
+    animation-delay:1.16s;
+  }
+  .boot-progress-meta{
+    color:rgba(249,240,230,.54);
+    font-size:.68rem;
+  }
+  .boot-progress-meta span:last-child{
+    color:#79e2d1;
   }
   .boot-status{
     position:absolute;
@@ -1571,24 +1620,39 @@
     letter-spacing:.18em;
     color:rgba(255,255,255,.54);
     text-transform:uppercase;
-    animation:boot-status-out 2.78s ease forwards;
+    animation:boot-status-pulse 4s ease forwards;
   }
-  @keyframes boot-device-flight{
-    0%{opacity:0; transform:translate3d(0, 24px, 0) scale(1.12) rotateX(0deg)}
-    10%{opacity:1}
-    46%{transform:translate3d(0, 0, 0) scale(1.12) rotateX(0deg)}
-    70%{transform:translate3d(0, -12px, -80px) scale(.82) rotateX(12deg)}
-    88%{opacity:1; transform:translate3d(0, -20px, -120px) scale(.72) rotateX(10deg)}
-    100%{opacity:0; transform:translate3d(0, -46px, -180px) scale(.58) rotateX(8deg)}
+  @keyframes boot-terminal-arrive{
+    0%{opacity:0; transform:translateY(18px) scale(.985)}
+    100%{opacity:1; transform:translateY(0) scale(1)}
   }
-  @keyframes boot-base-in{
-    0%,48%{opacity:0}
-    66%,92%{opacity:1}
-    100%{opacity:0}
+  @keyframes boot-progress-in{
+    to{opacity:1; transform:translateY(0)}
   }
-  @keyframes boot-status-out{
-    0%,72%{opacity:.68}
-    100%{opacity:0}
+  @keyframes boot-progress-fill{
+    0%{width:0}
+    18%{width:16%}
+    34%{width:37%}
+    52%{width:58%}
+    72%{width:78%}
+    88%{width:92%}
+    100%{width:100%}
+  }
+  @keyframes boot-progress-scan{
+    to{transform:translateX(780px)}
+  }
+  @keyframes boot-percent{
+    0%{content:"0%"}
+    18%{content:"16%"}
+    34%{content:"37%"}
+    52%{content:"58%"}
+    72%{content:"78%"}
+    88%{content:"92%"}
+    100%{content:"100%"}
+  }
+  @keyframes boot-status-pulse{
+    0%,82%{opacity:.68}
+    100%{opacity:.28}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -1611,9 +1675,12 @@
     .ink::after,
     .bg-particles span,
     .boot-device,
-    .boot-base,
     .boot-status,
-    .boot-line{
+    .boot-line,
+    .boot-progress,
+    .boot-progress-fill,
+    .boot-progress-scan,
+    .boot-progress-count::after{
       animation:none !important;
     }
     .rail .particle,
@@ -1667,8 +1734,10 @@
     .flow-img img{max-height:60vh}
     .boot-stage{width:94vw; height:68vh}
     .boot-device{width:92vw}
-    .boot-screen{height:330px; border-radius:18px; padding:10px}
+    .boot-screen{min-height:390px; border-radius:18px}
+    .boot-terminal{min-height:388px}
     .boot-code{padding:1rem; font-size:.68rem; line-height:1.75}
+    .boot-progress{margin:0 1rem 1rem; padding:.8rem}
     .boot-status{bottom:12vh; width:88vw; text-align:center}
   }
 </style>
@@ -1703,13 +1772,27 @@
           </div>
           <pre class="boot-code"><span class="boot-line" style="--delay:.12s"><span class="boot-prompt">$</span> whoami</span>
 <span class="boot-line boot-ok" style="--delay:.48s">yusong_wang · GIS × multimodal_ai</span>
-<span class="boot-line" style="--delay:.86s"><span class="boot-prompt">$</span> ./boot-portfolio --mode=research-engineering</span>
-<span class="boot-line boot-muted" style="--delay:1.22s">loading GISauto / Neo4j / RAG lanes...</span>
-<span class="boot-line boot-muted" style="--delay:1.58s">mounting papers, patents, embedded systems...</span>
-<span class="boot-line boot-ok" style="--delay:1.94s">open https://btsc0403.github.io <span class="boot-cursor"></span></span></pre>
+<span class="boot-line" style="--delay:.86s"><span class="boot-prompt">$</span> portfolioctl launch --target=homepage</span>
+<span class="boot-line boot-muted" style="--delay:1.30s">resolving GISauto, papers, patents, project graph...</span>
+<span class="boot-line boot-muted" style="--delay:1.86s">hydrating React Bits motion and research timeline...</span>
+<span class="boot-line boot-warn" style="--delay:2.46s">loading interface bundle: btsc0403.github.io</span>
+<span class="boot-line boot-ok" style="--delay:3.34s">homepage ready. opening portfolio <span class="boot-cursor"></span></span></pre>
+          <div class="boot-progress" aria-hidden="true">
+            <div class="boot-progress-head">
+              <span>Loading Homepage</span>
+              <span class="boot-progress-count"></span>
+            </div>
+            <div class="boot-progress-track">
+              <span class="boot-progress-fill"></span>
+              <span class="boot-progress-scan"></span>
+            </div>
+            <div class="boot-progress-meta">
+              <span>index.html / GIS-AI portfolio</span>
+              <span>ready</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="boot-base"></div>
     </div>
   </div>
   <div class="boot-status">Initializing Portfolio Interface</div>
@@ -2558,10 +2641,10 @@
       done = true;
       intro.classList.add('is-done');
       try { sessionStorage.setItem('portfolioBootIntro', 'done'); } catch (error) {}
-      window.setTimeout(() => intro.remove(), 650);
+      window.setTimeout(() => intro.remove(), 520);
     };
     skip?.addEventListener('click', finish);
-    window.setTimeout(finish, 2850);
+    window.setTimeout(finish, 3950);
   }
 
   setupReactBitsMotion();
