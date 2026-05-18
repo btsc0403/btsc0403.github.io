@@ -261,10 +261,14 @@
     position:fixed; left:1.1rem; top:50%; transform:translateY(-50%);
     z-index:40;
     width:172px;
-    --color-1:#680000;
-    --color-2:#8b0707;
-    --color-3:#b01818;
-    --color-4:#f0cbc4;
+    --rail-ink:#760000;
+    --rail-cream:#f8efe4;
+    --rail-cream-2:#fffaf2;
+    --rail-line:rgba(118,0,0,.16);
+    --color-1:#fff8ee;
+    --color-2:#f5e2d1;
+    --color-3:#ead0bd;
+    --color-4:#fff8ee;
     isolation:isolate;
     transform-style:preserve-3d;
   }
@@ -302,15 +306,16 @@
     position:absolute;
     inset:0;
     border-radius:999px;
-    background:linear-gradient(135deg, #680000 0%, #9c0000 62%, #b91919 100%);
+    background:var(--rail-cream);
     opacity:0;
     transform:scale(.82);
     transition:all .3s ease;
     z-index:-1;
-    box-shadow:0 20px 36px -22px rgba(104,0,0,.92);
+    border:1px solid var(--rail-line);
+    box-shadow:0 18px 34px -24px rgba(118,0,0,.45), inset 0 1px 0 rgba(255,255,255,.82);
   }
   .rail li.active{
-    color:#fff;
+    color:var(--rail-ink);
     text-shadow:none;
     transform:translateX(6px);
   }
@@ -353,22 +358,22 @@
     font-size:.8rem; font-weight:800;
   }
   .rail li:hover{
-    color:#fff;
+    color:var(--rail-ink);
   }
   .rail li:hover button{
-    background:rgba(104,0,0,.12);
-    border-color:rgba(104,0,0,.22);
+    background:rgba(248,239,228,.86);
+    border-color:var(--rail-line);
   }
   .rail li.active button{
-    background:transparent;
-    color:#fff;
-    border-color:transparent;
-    box-shadow:none;
+    background:rgba(255,250,242,.94);
+    color:var(--rail-ink);
+    border-color:var(--rail-line);
+    box-shadow:0 16px 30px -24px rgba(118,0,0,.45), inset 0 1px 0 rgba(255,255,255,.86);
   }
   .rail li.active button::before,
   .rail li:hover button::before{
-    background:rgba(255,255,255,.18);
-    color:#fff;
+    background:rgba(156,0,0,.1);
+    color:var(--rail-ink);
     transform:scale(.96);
   }
   .rail .effect{
@@ -386,11 +391,11 @@
     overflow:visible;
   }
   .rail .effect.text{
-    color:#fff;
+    color:var(--rail-ink);
     z-index:2;
-    text-shadow:0 1px 1px rgba(30,0,0,.25);
+    text-shadow:none;
     transition:color .3s ease;
-    opacity:0;
+    display:none;
   }
   .rail .effect.text .rail-effect-copy{
     width:164px;
@@ -402,7 +407,7 @@
     padding:.38rem .72rem;
     font-size:.8rem;
     font-weight:800;
-    opacity:.92;
+    opacity:1;
     transform:translateX(6px);
   }
   .rail .effect.text .rail-effect-copy::before{
@@ -415,28 +420,30 @@
     font-family:'JetBrains Mono',monospace;
     font-size:.68rem;
     font-weight:800;
-    background:rgba(255,255,255,.18);
+    background:rgba(156,0,0,.1);
     flex-shrink:0;
   }
   .rail .effect.filter{
-    filter:blur(5px) contrast(22) saturate(1.35);
+    filter:blur(3px) saturate(1.05);
     mix-blend-mode:normal;
+    opacity:.58;
   }
   .rail .effect.filter::after{
     content:'';
     position:absolute;
     inset:0;
-    background:linear-gradient(135deg, #680000 0%, #9c0000 62%, #b91919 100%);
+    background:var(--rail-cream);
     transform:scale(0);
     opacity:0;
     z-index:-1;
     border-radius:999px;
+    box-shadow:0 16px 34px -26px rgba(118,0,0,.52);
   }
   .rail .effect.active::after{
     animation:rail-pill .3s ease both;
   }
   @keyframes rail-pill{
-    to{transform:scale(1); opacity:1}
+    to{transform:scale(1); opacity:.52}
   }
   .rail .particle,
   .rail .point{
@@ -457,7 +464,7 @@
   .rail .point{
     background:var(--color);
     opacity:1;
-    box-shadow:0 0 18px color-mix(in srgb, var(--color), transparent 30%);
+    box-shadow:0 0 16px rgba(156,0,0,.18), 0 0 0 1px rgba(118,0,0,.08);
     animation:rail-point calc(var(--time)) ease 1 -350ms;
   }
   @keyframes rail-particle{
@@ -2661,7 +2668,7 @@
     particleDistances: [90, 10],
     particleR: 100,
     timeVariance: 300,
-    colors: [1, 2, 3, 1, 2, 3, 1, 4]
+    colors: [1, 2, 3, 1, 2, 3, 1, 2]
   };
   railEffectFilter.className = 'effect filter';
   railEffectFilter.setAttribute('aria-hidden', 'true');
@@ -2728,10 +2735,10 @@
 
     for (let i = 0; i < railGooOptions.particleCount; i++) {
       const t = railGooOptions.animationTime * 2 + railNoise(railGooOptions.timeVariance * 2);
-      const particleData = createRailParticle(i, t, d, r);
-      element.classList.remove('active');
+    const particleData = createRailParticle(i, t, d, r);
+    element.classList.remove('active');
 
-      window.setTimeout(() => {
+    window.setTimeout(() => {
         const particle = document.createElement('span');
         const point = document.createElement('span');
         particle.classList.add('particle');
@@ -2741,7 +2748,7 @@
         particle.style.setProperty('--end-y', `${particleData.end[1]}px`);
         particle.style.setProperty('--time', `${particleData.time}ms`);
         particle.style.setProperty('--scale', `${particleData.scale}`);
-        particle.style.setProperty('--color', `var(--color-${particleData.color}, #9c0000)`);
+        particle.style.setProperty('--color', `var(--color-${particleData.color}, #f5e2d1)`);
         particle.style.setProperty('--rotate', `${particleData.rotate}deg`);
 
         point.classList.add('point');
