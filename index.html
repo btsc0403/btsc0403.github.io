@@ -1200,6 +1200,106 @@
     white-space:nowrap;
   }
 
+  .portfolio-wrap{
+    width:100%;
+    max-width:1320px;
+  }
+  .portfolio-showcase{
+    margin-top:1.45rem;
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:1.1rem;
+    align-items:stretch;
+  }
+  .portfolio-preview{
+    border:1px solid rgba(156,0,0,.12);
+    border-radius:20px;
+    padding:1rem;
+    background:linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.55));
+    box-shadow:0 22px 54px -42px rgba(26,26,26,.5), inset 0 1px 0 rgba(255,255,255,.7);
+    backdrop-filter:blur(8px);
+  }
+  .portfolio-preview img{
+    display:block;
+    width:100%;
+    aspect-ratio:3.1/1;
+    object-fit:cover;
+    border-radius:14px;
+    border:1px solid rgba(26,26,26,.08);
+    box-shadow:0 18px 46px -34px rgba(26,26,26,.45);
+  }
+  .portfolio-preview h3{
+    margin:.9rem 0 .35rem;
+    font-family:'Noto Serif SC',serif;
+    font-size:1.45rem;
+  }
+  .portfolio-preview p{
+    margin:0;
+    color:rgba(26,26,26,.66);
+    font-size:.78rem;
+    line-height:1.65;
+  }
+  .portfolio-stats{
+    margin-top:1rem;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:.55rem;
+  }
+  .portfolio-stats div{
+    border-radius:14px;
+    padding:.75rem .7rem;
+    background:rgba(156,0,0,.045);
+    border:1px solid rgba(156,0,0,.1);
+  }
+  .portfolio-stats b{
+    display:block;
+    font-family:'Noto Serif SC',serif;
+    font-size:1.45rem;
+    color:#9C0000;
+    line-height:1;
+  }
+  .portfolio-stats span{
+    display:block;
+    margin-top:.25rem;
+    font-size:.66rem;
+    color:rgba(26,26,26,.58);
+  }
+  .portfolio-list{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:.75rem;
+  }
+  .portfolio-item{
+    min-height:112px;
+    border-radius:18px;
+    padding:.88rem .95rem;
+    background:linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.56));
+    border:1px solid rgba(156,0,0,.1);
+    box-shadow:0 16px 40px -36px rgba(26,26,26,.46), inset 0 1px 0 rgba(255,255,255,.64);
+  }
+  .portfolio-item small{
+    display:flex;
+    justify-content:space-between;
+    gap:.8rem;
+    color:#9C0000;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:800;
+    font-size:.6rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  .portfolio-item h3{
+    margin:.45rem 0 .28rem;
+    font-family:'Noto Serif SC',serif;
+    font-size:1rem;
+  }
+  .portfolio-item p{
+    margin:0;
+    color:rgba(26,26,26,.62);
+    font-size:.68rem;
+    line-height:1.48;
+  }
+
   /* Hero decor */
   .slab{position:absolute; border-radius:24px}
   .slab.red{background:#9C0000; color:#fff}
@@ -1737,6 +1837,8 @@
     .gisauto-footer{grid-template-columns:1fr}
     .gisauto-integrated{grid-template-columns:1fr}
     .work-grid{grid-template-columns:1fr}
+    .portfolio-showcase{grid-template-columns:1fr}
+    .portfolio-list,.portfolio-stats{grid-template-columns:1fr 1fr}
     .project-mini{grid-template-columns:32px 1fr}
     .project-mini time{display:none}
     .home-exp-item{grid-template-columns:52px 1fr}
@@ -1835,7 +1937,7 @@
     <span style="color:rgba(26,26,26,.55); font-size:.9rem">GIS × Multimodal AI</span>
   </a>
   <div style="display:flex; align-items:center; gap:.75rem">
-    <span class="slide-counter" id="slideCounter">01/05</span>
+    <span class="slide-counter" id="slideCounter">01/06</span>
     <button id="langBtn" class="chip" style="cursor:pointer; font-weight:600">
       <span class="lang-zh">EN</span><span class="lang-en">中文</span>
     </button>
@@ -1891,7 +1993,7 @@
         <a class="rb-magnet rb-shiny-button" onclick="goTo(1)" style="cursor:pointer; background:#9C0000; color:#fff; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">看 GISauto →</span><span class="lang-en">See GISauto →</span>
         </a>
-        <a class="rb-magnet" onclick="goTo(4)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
+        <a class="rb-magnet" onclick="goTo(5)" style="cursor:pointer; border:1px solid rgba(156,0,0,.4); color:#9C0000; padding:.75rem 1.5rem; border-radius:999px; font-size:.85rem; font-weight:600">
           <span class="lang-zh">联系我</span><span class="lang-en">Get in touch</span>
         </a>
       </div>
@@ -2149,6 +2251,52 @@
 <!-- =========================================================
   SLIDE 8 · EXPERIENCE (HORIZONTAL TIMELINE, DARK)
 ========================================================= -->
+<!-- =========================================================
+  SLIDE 8 · PORTFOLIO SHOWCASE
+========================================================= -->
+<section class="slide paper grain" id="s12">
+  <div class="portfolio-wrap">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap">
+      <div>
+        <div class="eyebrow"><span class="lang-zh">作品集</span><span class="lang-en">Portfolio</span> · 03</div>
+        <h2 class="display" style="font-size:2.6rem; margin-top:.65rem">
+          <span class="lang-zh">课程作品、视频演示与汇报材料</span>
+          <span class="lang-en">Course works, demos, and presentation material</span>
+        </h2>
+      </div>
+      <div class="rule" style="flex:1; min-width:200px; margin-bottom:1rem"></div>
+    </div>
+
+    <div class="portfolio-showcase">
+      <div class="portfolio-preview rb-spotlight">
+        <img src="assets/portfolio_showcase/final_output.png" alt="Portfolio visual output preview" />
+        <h3><span class="lang-zh">作品集素材库</span><span class="lang-en">Portfolio material library</span></h3>
+        <p>
+          <span class="lang-zh">把桌面作品集文件夹中的视觉输出、课程汇报、PDF 文档与视频演示统一整理成一个栏目，作为前端作品集里的补充入口。</span>
+          <span class="lang-en">A compact index for visual output, course reports, PDF documents, and video demos from the desktop portfolio folder.</span>
+        </p>
+        <div class="portfolio-stats">
+          <div><b>8</b><span><span class="lang-zh">文件</span><span class="lang-en">files</span></span></div>
+          <div><b>4</b><span><span class="lang-zh">视频</span><span class="lang-en">videos</span></span></div>
+          <div><b>2</b><span>PDF</span></div>
+          <div><b>1</b><span>PPTX</span></div>
+        </div>
+      </div>
+
+      <div class="portfolio-list">
+        <div class="portfolio-item rb-spotlight"><small><span>PNG</span><span>0.8 MB</span></small><h3>Final Output</h3><p><span class="lang-zh">视觉输出预览图，作为作品集栏目主视觉。</span><span class="lang-en">Visual output preview used as the section lead image.</span></p></div>
+        <div class="portfolio-item rb-spotlight"><small><span>PDF</span><span>9.5 MB</span></small><h3>Group 10</h3><p><span class="lang-zh">小组项目报告，适合做项目过程与最终交付说明。</span><span class="lang-en">Group report for process documentation and final delivery.</span></p></div>
+        <div class="portfolio-item rb-spotlight"><small><span>PDF</span><span>11.8 MB</span></small><h3>Group 543-1</h3><p><span class="lang-zh">课程汇报材料，补充研究、设计与展示过程。</span><span class="lang-en">Course presentation material covering research and design.</span></p></div>
+        <div class="portfolio-item rb-spotlight"><small><span>PPTX</span><span>6.0 MB</span></small><h3>Miniproject #2 Part B</h3><p><span class="lang-zh">小项目第二阶段展示稿，可用于课堂作品说明。</span><span class="lang-en">Second-stage mini project deck for class presentation.</span></p></div>
+        <div class="portfolio-item rb-spotlight"><small><span>MP4</span><span>47.7 MB</span></small><h3>YusongWang</h3><p><span class="lang-zh">个人视频演示素材，适合后续替换为在线链接。</span><span class="lang-en">Personal demo video material, ready for online link replacement.</span></p></div>
+        <div class="portfolio-item rb-spotlight"><small><span>MP4</span><span>173 MB</span></small><h3>Creative Practice</h3><p><span class="lang-zh">创意实践视频，大文件保留为离线素材。</span><span class="lang-en">Creative practice video, kept offline because of file size.</span></p></div>
+        <div class="portfolio-item rb-spotlight"><small><span>MP4</span><span>248 MB</span></small><h3>Mini Project #1</h3><p><span class="lang-zh">小项目视频记录，作为项目演示素材索引。</span><span class="lang-en">Mini project video record indexed for demo use.</span></p></div>
+        <div class="portfolio-item rb-spotlight"><small><span>MP4</span><span>129 MB</span></small><h3>May 2026 Demo</h3><p><span class="lang-zh">2026 年 5 月演示视频，后续可接入外部播放链接。</span><span class="lang-en">May 2026 demo video, ready for an external playback link.</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="slide ink grain archived-slide" id="s8">
   <div style="width:100%; max-width:1300px">
     <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">经历</span><span class="lang-en">Experience</span> · 05</div>
@@ -2317,7 +2465,7 @@
   <div style="width:100%; max-width:1300px">
     <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2.5rem">
       <div>
-        <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">工具链</span><span class="lang-en">Toolbox</span> · 03</div>
+        <div class="eyebrow" style="color:#ff6b6b"><span class="lang-zh">工具链</span><span class="lang-en">Toolbox</span> · 04</div>
         <h2 class="display" style="font-size:2.8rem; margin-top:.75rem">
           <span class="lang-zh">从 PCB 到 Prompt</span><span class="lang-en">From PCB to Prompt</span>
         </h2>
@@ -2401,7 +2549,7 @@
 ========================================================= -->
 <section class="slide paper grain" id="s11">
   <div style="width:100%; max-width:1100px; text-align:left">
-    <div class="eyebrow"><span class="lang-zh">联系</span><span class="lang-en">Contact</span> · 04</div>
+    <div class="eyebrow"><span class="lang-zh">联系</span><span class="lang-en">Contact</span> · 05</div>
     <h2 class="display" style="font-size:clamp(3rem, 5vw, 5rem); margin-top:1rem; line-height:1.05">
       <span class="lang-zh">一起把<span style="color:#9C0000">历史</span><br/>装进<span style="color:#9C0000">下一个模型</span>。</span>
       <span class="lang-en">Let&apos;s put <span style="color:#9C0000">history</span><br/>into the <span style="color:#9C0000">next model</span>.</span>
@@ -2461,6 +2609,7 @@
     ['首页', 'Home'],
     ['GISauto', 'GISauto'],
     ['成果·项目', 'Work'],
+    ['作品集', 'Portfolio'],
     ['技能', 'Skills'],
     ['联系', 'Contact']
   ];
